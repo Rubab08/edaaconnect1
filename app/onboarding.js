@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {
 	Alert,
@@ -28,7 +27,7 @@ const copy = {
 	},
 };
 
-export default function OnboardingScreen() {
+export default function OnboardingScreen({ navigation }) {
 	const [language, setLanguage] = useState('en');
 	const text = copy[language];
 
@@ -61,14 +60,14 @@ export default function OnboardingScreen() {
 				<View style={{ marginBottom: 24 }}>
 					<Pressable
 						accessibilityRole="button"
-						onPress={() => router.push('/login')}
+						onPress={() => navigation.navigate('Login')}
 						style={{ height: 48, borderRadius: 9, backgroundColor: '#8124ee', alignItems: 'center', justifyContent: 'center', marginBottom: 32 }}
 					>
 						<Text style={{ color: '#fff', fontSize: 19, fontWeight: '500' }}>{text.login}</Text>
 					</Pressable>
 					<Pressable
 						accessibilityRole="button"
-						onPress={() => router.push('/register')}
+						onPress={() => navigation.navigate('Register')}
 						style={{ height: 48, borderRadius: 9, backgroundColor: '#3c30b7', alignItems: 'center', justifyContent: 'center' }}
 					>
 						<Text style={{ color: '#fff', fontSize: 18, fontWeight: '500', textAlign: 'center' }}>{text.createAccount}</Text>

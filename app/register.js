@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {
 	Alert,
@@ -108,27 +107,9 @@ function BackgroundPattern() {
 			))}
 		</View>
 	);
+}
 
-    {/* Bottom glowing columns */}
-          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '25%', backgroundColor: 'rgba(57, 34, 150, 0.4)' }} />
-          {[
-            { left: '5%', height: '18%', width: 25 },
-            { left: '15%', height: '12%', width: 20 },
-            { left: '30%', height: '15%', width: 30 },
-            { left: '50%', height: '20%', width: 15 },
-            { left: '70%', height: '16%', width: 35 },
-            { left: '85%', height: '19%', width: 20 },
-            { left: '95%', height: '23%', width: 15 },
-          ].map((col, index) => (
-            <View
-              key={index}
-              style={[{ position: 'absolute', bottom: 0, backgroundColor: 'rgba(92, 114, 255, 0.25)' }, col]}
-            />
-          ))}
-
-		} ;    
-
-export default function RegisterScreen() {
+export default function RegisterScreen({ navigation }) {
 	const [language, setLanguage] = useState('en');
 	const [calendar, setCalendar] = useState('gregorian');
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -256,7 +237,7 @@ export default function RegisterScreen() {
 					</View>
 
 					<View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12, gap: 8 }}>
-						<Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={{ width: 28, height: 28, justifyContent: 'center' }}>
+						<Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => navigation.goBack()} style={{ width: 28, height: 28, justifyContent: 'center' }}>
 							<Ionicons name="arrow-back" size={18} color="#fff" />
 						</Pressable>
 						<View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
