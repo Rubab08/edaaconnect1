@@ -125,11 +125,8 @@ function BackgroundPattern() {
               style={[{ position: 'absolute', bottom: 0, backgroundColor: 'rgba(92, 114, 255, 0.25)' }, col]}
             />
           ))}
-        
-        
-      
-    
-}
+
+		} ;    
 
 export default function RegisterScreen() {
 	const [language, setLanguage] = useState('en');

@@ -166,7 +166,7 @@ export default function LoginScreen({ navigation }) {
 
           {/* Back Button */}
           <Pressable
-            onPress={() => router.replace('/onboarding')}
+            onPress={() => router.push('/onboarding')}
             style={{ width: 40, height: 40, justifyContent: 'center', marginTop: 12 }}
           >
             <Ionicons name={isRtl ? "arrow-forward" : "arrow-back"} size={26} color="#fff" />
