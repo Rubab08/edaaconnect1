@@ -61,27 +61,74 @@ const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: currentYear - 1899 }, (_, index) => String(currentYear - index));
 const hijriYearOptions = Array.from({ length: 1448 - 1358 + 1 }, (_, index) => String(1358 + index));
 const monthOptions = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, '0'));
+const hijriMonthOptions = [
+	{ value: '01', label: 'Muharram' },
+	{ value: '02', label: 'Safar' },
+	{ value: '03', label: 'Rabi I' },
+	{ value: '04', label: 'Rabi II' },
+	{ value: '05', label: 'Jumada I' },
+	{ value: '06', label: 'Jumada II' },
+	{ value: '07', label: 'Rajab' },
+	{ value: '08', label: "Sha'ban" },
+	{ value: '09', label: 'Ramadan' },
+	{ value: '10', label: 'Shawwal' },
+	{ value: '11', label: "Dhu al-Qi'dah" },
+	{ value: '12', label: 'Dhu al-Hijjah' },
+];
+const formFields = [
+	{ key: 'email', placeholder: 'email@domain.com', keyboardType: 'email-address' },
+	{ key: 'mobile', placeholder: '9665xxxxxx', keyboardType: 'phone-pad' },
+	{ key: 'identity', placeholder: 'National ID / IQAMA', keyboardType: 'alphanumeric' },
+];
+const dateFields = [
+	{ key: 'year', flex: 1 },
+	{ key: 'month', flex: 1.5, requires: 'year' },
+	{ key: 'day', flex: 1, requires: 'month' },
+];
+const glowColumns = [
+	{ left: '5%', height: '18%', width: 25 },
+	{ left: '15%', height: '12%', width: 20 },
+	{ left: '30%', height: '15%', width: 30 },
+	{ left: '50%', height: '20%', width: 15 },
+	{ left: '70%', height: '16%', width: 35 },
+	{ left: '85%', height: '19%', width: 20 },
+	{ left: '95%', height: '23%', width: 15 },
+];
 
 function BackgroundPattern() {
 	return (
 		<View pointerEvents="none" style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}>
-			<View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden' }}>
-				{Array.from({ length: 23 }, (_, row) => (
-					<View
-						key={row}
-						style={[{ position: 'absolute', flexDirection: 'row', gap: 9, width: '115%' }, { top: `${row * 4.5}%`, left: row % 2 ? -24 : -4 }]}
-					>
-						{Array.from({ length: 12 }, (_, column) => (
-							<Text key={column} style={{ color: '#7224b5', opacity: 0.2, fontSize: 30, fontWeight: '800', width: 31, transform: [{ rotate: '14deg' }] }}>
-								›
-							</Text>
-						))}
-					</View>
-				))}
-			</View>
-			<View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '24%', backgroundColor: 'rgba(70, 43, 190, 0.42)' }} />
+			
+			<View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '25%', backgroundColor: 'rgba(57, 34, 150, 0.4)' }} />
+			{glowColumns.map((column, index) => (
+				<View
+					key={index}
+					style={[{ position: 'absolute', bottom: 0, backgroundColor: 'rgba(92, 114, 255, 0.25)' }, column]}
+				/>
+			))}
 		</View>
 	);
+
+    {/* Bottom glowing columns */}
+          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '25%', backgroundColor: 'rgba(57, 34, 150, 0.4)' }} />
+          {[
+            { left: '5%', height: '18%', width: 25 },
+            { left: '15%', height: '12%', width: 20 },
+            { left: '30%', height: '15%', width: 30 },
+            { left: '50%', height: '20%', width: 15 },
+            { left: '70%', height: '16%', width: 35 },
+            { left: '85%', height: '19%', width: 20 },
+            { left: '95%', height: '23%', width: 15 },
+          ].map((col, index) => (
+            <View
+              key={index}
+              style={[{ position: 'absolute', bottom: 0, backgroundColor: 'rgba(92, 114, 255, 0.25)' }, col]}
+            />
+          ))}
+        
+        
+      
+    
 }
 
 export default function RegisterScreen() {
@@ -100,8 +147,7 @@ export default function RegisterScreen() {
 		setForm((current) => ({ ...current, [field]: value }));
 		setErrors((current) => ({ ...current, [field]: field === 'mobile' ? value.length < 11 : false }));
 	}
-
-	function changeCalendar(nextCalendar) {
+    function changeCalendar(nextCalendar) {
 		setCalendar(nextCalendar);
 		setForm((current) => ({ ...current, year: '', month: '', day: '' }));
 		setErrors((current) => ({ ...current, year: false, month: false, day: false }));
@@ -118,14 +164,16 @@ export default function RegisterScreen() {
 			terms: !acceptedTerms,
 		};
 		setErrors(nextErrors);
-		if (Object.values(nextErrors).some(Boolean)) {
+		const invalidFields = Object.keys(nextErrors).filter((field) => nextErrors[field]);
+		if (invalidFields.length > 0) {
 			return;
 		}
 		Alert.alert(text.title, language === 'en' ? 'Your registration details are ready.' : 'بيانات التسجيل جاهزة.');
 	}
 
 	function openDatePicker(stage) {
-		if ((stage === 'month' && !form.year) || (stage === 'day' && !form.month)) return;
+		const dateField = dateFields.find((field) => field.key === stage);
+		if (!dateField || (dateField.requires && !form[dateField.requires])) return;
 
 		const fallbackValue = stage === 'year'
 			? calendar === 'hijri' ? '1358' : String(currentYear - 25)
@@ -158,17 +206,28 @@ export default function RegisterScreen() {
 	}
 
 	function getPickerOptions() {
-		if (pickerStage === 'year') return calendar === 'hijri' ? hijriYearOptions : yearOptions;
-		if (pickerStage === 'month') return monthOptions;
-		if (calendar === 'hijri') return Array.from({ length: 30 }, (_, index) => String(index + 1).padStart(2, '0'));
-		const daysInMonth = form.month ? new Date(Number(form.year), Number(form.month), 0).getDate() : 31;
-		return Array.from({ length: daysInMonth }, (_, index) => String(index + 1).padStart(2, '0'));
+		if (pickerStage === 'year') {
+			const years = calendar === 'hijri' ? hijriYearOptions : yearOptions;
+			return years.map((value) => ({ value, label: value }));
+		}
+		if (pickerStage === 'month') {
+			if (calendar === 'hijri') return hijriMonthOptions;
+			return monthOptions.map((value) => ({ value, label: value }));
+		}
+
+		const daysInMonth = calendar === 'hijri'
+			? 30
+			: form.month ? new Date(Number(form.year), Number(form.month), 0).getDate() : 31;
+		return Array.from({ length: daysInMonth }, (_, index) => {
+			const value = String(index + 1).padStart(2, '0');
+			return { value, label: value };
+		});
 	}
 
 	function renderField(label, field, placeholder, keyboardType = 'default') {
 		return (
-			<View style={{ marginBottom: 14 }}>
-				<Text style={{ color: '#fff', fontSize: 16, fontWeight: '600', marginBottom: 8 }}>{label}</Text>
+			<View style={{ marginBottom: 10 }}>
+				<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginBottom: 6 }}>{label}</Text>
 				<TextInput
 					accessibilityLabel={label}
 					value={form[field]}
@@ -176,9 +235,9 @@ export default function RegisterScreen() {
 					placeholder={placeholder}
 					placeholderTextColor="#a3afbc"
 					keyboardType={keyboardType}
-					autoCapitalize={field === 'email' ? 'none' : 'none'}
+					autoCapitalize="none"
 					autoCorrect={false}
-					style={[{ height: 44, borderRadius: 10, backgroundColor: '#001d31', paddingHorizontal: 16, color: '#fff', fontSize: 15 }, language === 'ar' && { textAlign: 'right' }]}
+					style={[{ height: 35, borderRadius: 8, backgroundColor: '#001d31', paddingHorizontal: 12, color: '#fff', fontSize: 11 }, language === 'ar' && { textAlign: 'right' }]}
 				/>
 				{errors[field] && <Text style={{ color: '#ff6676', fontSize: 12, marginTop: 4 }}>{fieldErrorMessages[field]}</Text>}
 			</View>
@@ -190,24 +249,24 @@ export default function RegisterScreen() {
 			<StatusBar barStyle="light-content" backgroundColor="#20205f" />
 			<BackgroundPattern />
 			<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-				<ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingTop: 8, paddingBottom: 18 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-					<View style={{ height: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-						<Text style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: '700' }}>{text.title}</Text>
+				<ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingTop: 4, paddingBottom: 12}} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+					<View style={{ height: 32, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+						<Text style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', color: '#fff', fontSize: 16, fontWeight: '700' }}>{text.title}</Text>
 						<Pressable accessibilityRole="button" accessibilityLabel={language === 'en' ? 'Change language' : 'تغيير اللغة'} onPress={() => setLanguage(language === 'en' ? 'ar' : 'en')} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, zIndex: 1 }}>
-							<Ionicons name="sunny" size={24} color="#fff" />
-							<Text style={{ color: '#fff', fontSize: 16 }}>{text.language}</Text>
+							<Ionicons name="sunny-outline" size={18} color="#fff" />
+							<Text style={{ color: '#fff', fontSize: 11 }}>{text.language}</Text>
 						</Pressable>
 					</View>
 
-					<View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 22, gap: 8 }}>
-						<Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={{ width: 34, height: 34, justifyContent: 'center' }}>
-							<Ionicons name="arrow-back" size={26} color="#fff" />
+					<View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12, gap: 8 }}>
+						<Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={{ width: 28, height: 28, justifyContent: 'center' }}>
+							<Ionicons name="arrow-back" size={18} color="#fff" />
 						</Pressable>
 						<View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
 							{[0, 1, 2, 3].map((step) => (
-								<View key={step} style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-									<View style={{ width: 22, height: 22, borderWidth: step === 0 ? 3 : 2, borderColor: '#fff', borderRadius: 12, alignItems: 'center', justifyContent: 'center' }}>
-										{step === 0 && <View style={{ width: 14, height: 14, borderWidth: 1.5, borderColor: '#fff', borderRadius: 8 }} />}
+									<View key={step} style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+										<View style={{ width: 18, height: 18, borderWidth: step === 0 ? 2 : 1.5, borderColor: '#fff', borderRadius: 9, alignItems: 'center', justifyContent: 'center' }}>
+											{step === 0 && <View style={{ width: 11, height: 11, borderWidth: 1, borderColor: '#fff', borderRadius: 6 }} />}
 									</View>
 									{step < 3 && <View style={{ flex: 1, height: 2, backgroundColor: '#fff', marginHorizontal: 4 }} />}
 								</View>
@@ -215,55 +274,59 @@ export default function RegisterScreen() {
 						</View>
 					</View>
 
-					<View style={{ marginTop: 24 }}>
-						{renderField(text.email, 'email', 'email@domain.com', 'email-address')}
-						{renderField(text.mobile, 'mobile', '9665xxxxxx')}
-						{renderField(text.identity, 'identity', 'National ID / IQAMA')}
+					<View style={{ marginTop: 60 }}>
+						{formFields.map((field) => renderField(text[field.key], field.key, field.placeholder, field.keyboardType))}
 
-						<View style={{ height: 42, borderWidth: 1.5, borderColor: '#c4d0dc', borderRadius: 13, backgroundColor: '#001d31', flexDirection: 'row', alignItems: 'center', padding: 4, marginBottom: 16 }}>
-							<Pressable accessibilityRole="button" accessibilityState={{ selected: calendar === 'gregorian' }} onPress={() => changeCalendar('gregorian')} style={{ flex: 1, height: 33, borderRadius: 9, backgroundColor: calendar === 'gregorian' ? '#8124ee' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-								<Text style={{ color: '#fff', fontSize: 15 }}>{text.gregorian}</Text>
+						<View style={{ height: 30, borderWidth: 1, borderColor: '#c4d0dc', borderRadius: 9, backgroundColor: '#001d31', flexDirection: 'row', alignItems: 'center', padding: 2, marginBottom: 12 }}>
+							<Pressable accessibilityRole="button" accessibilityState={{ selected: calendar === 'gregorian' }} onPress={() => changeCalendar('gregorian')} style={{ flex: 1, height: 24, borderRadius: 6, backgroundColor: calendar === 'gregorian' ? '#8124ee' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+								<Text style={{ color: '#fff', fontSize: 10 }}>{text.gregorian}</Text>
 							</Pressable>
-							<Pressable accessibilityRole="button" accessibilityState={{ selected: calendar === 'hijri' }} onPress={() => changeCalendar('hijri')} style={{ flex: 1, height: 33, borderRadius: 9, backgroundColor: calendar === 'hijri' ? '#8124ee' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-								<Text style={{ color: '#fff', fontSize: 15 }}>{text.hijri}</Text>
+							<Pressable accessibilityRole="button" accessibilityState={{ selected: calendar === 'hijri' }} onPress={() => changeCalendar('hijri')} style={{ flex: 1, height: 24, borderRadius: 6, backgroundColor: calendar === 'hijri' ? '#8124ee' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+								<Text style={{ color: '#fff', fontSize: 10 }}>{text.hijri}</Text>
 							</Pressable>
 						</View>
 
-						<Text style={{ color: '#fff', fontSize: 16, fontWeight: '600', marginBottom: 8 }}>{text.birthDate}</Text>
-						<View style={{ flexDirection: 'row', gap: 8 }}>
-							{[
-								{ key: 'year', label: text.year, maxLength: 4, flex: 1 },
-								{ key: 'month', label: text.month, maxLength: 2, flex: 1.5 },
-								{ key: 'day', label: text.day, maxLength: 2, flex: 1 },
-							].map((dateField) => (
+						<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginBottom: 6 }}>{text.birthDate}</Text>
+						<View style={{ flexDirection: 'row', gap: 6 }}>
+							{dateFields.map((dateField) => {
+								const disabled = Boolean(dateField.requires && !form[dateField.requires]);
+								const hijriMonth = dateField.key === 'month' && calendar === 'hijri'
+									? hijriMonthOptions.find((month) => month.value === form.month)?.label
+									: null;
+								const value = hijriMonth || form[dateField.key] || '—';
+								return (
 								<View key={dateField.key} style={{ flex: dateField.flex }}>
-									<Text style={{ color: '#d5d8e7', fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 6 }}>{dateField.label}</Text>
+									<Text style={{ color: '#d5d8e7', fontSize: 10, fontWeight: '600', textAlign: 'center', marginBottom: 4 }}>{text[dateField.key]}</Text>
 									<Pressable
 										accessibilityRole="button"
-										accessibilityState={{ disabled: (dateField.key === 'month' && !form.year) || (dateField.key === 'day' && !form.month) }}
-										disabled={(dateField.key === 'month' && !form.year) || (dateField.key === 'day' && !form.month)}
+										accessibilityState={{ disabled }}
+										disabled={disabled}
 										onPress={() => openDatePicker(dateField.key)}
-										style={{ height: 44, borderWidth: 1, borderColor: '#8393a8', borderRadius: 9, backgroundColor: '#001d31', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, opacity: ((dateField.key === 'month' && !form.year) || (dateField.key === 'day' && !form.month)) ? 0.45 : 1 }}
+										style={{ height: 34, borderWidth: 1, borderColor: '#8393a8', borderRadius: 7, backgroundColor: '#001d31', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, opacity: disabled ? 0.45 : 1 }}
 									>
-										<Text style={{ flex: 1, color: form[dateField.key] ? '#fff' : '#9eafbd', fontSize: 15, textAlign: 'center' }}>{form[dateField.key] || '—'}</Text>
-										<Ionicons name="chevron-down" size={16} color="#a3afbc" />
+										<Text style={{ flex: 1, color: form[dateField.key] ? '#fff' : '#9eafbd', fontSize: 11, textAlign: 'center' }}>{value}</Text>
+										<Ionicons name="chevron-down" size={12} color="#a3afbc" />
 									</Pressable>
 								</View>
-							))}
+								);
+							})}
 						</View>
 						{(errors.year || errors.month || errors.day) && <Text style={{ color: '#ff6676', fontSize: 12, marginTop: 4 }}>Please Enter Date Of Birth</Text>}
 
-						<Pressable accessibilityRole="checkbox" accessibilityState={{ checked: acceptedTerms }} onPress={() => setAcceptedTerms(!acceptedTerms)} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 22, marginBottom: 20 }}>
-							<Ionicons name={acceptedTerms ? 'checkbox' : 'square-outline'} size={24} color="#fff" />
-							<Text style={{ color: '#fff', fontSize: 14, marginLeft: 8 }}>{text.terms} </Text>
-							<Pressable accessibilityRole="link" onPress={() => Alert.alert(text.termsLink)}>
-								<Text style={{ color: '#d98aff', fontSize: 14, textDecorationLine: 'underline' }}>{text.termsLink}</Text>
+						<View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 14, marginBottom: 14 }}>
+							<Pressable accessibilityRole="checkbox" accessibilityState={{ checked: acceptedTerms }} onPress={() => setAcceptedTerms(!acceptedTerms)} style={{ flexDirection: 'row', alignItems: 'center' }}>
+								<Ionicons name={acceptedTerms ? 'checkbox' : 'square-outline'} size={18} color="#fff" />
+								<Text style={{ color: '#fff', fontSize: 10, marginLeft: 5 }}>{text.terms}</Text>
 							</Pressable>
-						</Pressable>
+							<Pressable accessibilityRole="link" onPress={() => Alert.alert(text.termsLink)} style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 3 }}>
+								<Text style={{ color: '#d98aff', fontSize: 10, textDecorationLine: 'underline' }}>{text.termsLink}</Text>
+								<Ionicons name="open-outline" size={12} color="#d98aff" style={{ marginLeft: 3 }} />
+							</Pressable>
+						</View>
 						{errors.terms && <Text style={{ color: '#ff6676', fontSize: 12, marginTop: -16, marginBottom: 10 }}>{language === 'en' ? 'Please accept the terms.' : 'يرجى الموافقة على الشروط.'}</Text>}
 
-						<Pressable accessibilityRole="button" onPress={submitRegistration} style={{ height: 50, borderRadius: 9, backgroundColor: '#8124ee', alignItems: 'center', justifyContent: 'center', marginTop: 8 }}>
-							<Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>{text.continue}</Text>
+						<Pressable accessibilityRole="button" onPress={submitRegistration} style={{ height: 36, borderRadius: 7, backgroundColor: '#8124ee', alignItems: 'center', justifyContent: 'center', marginTop: 8 }}>
+							<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{text.continue}</Text>
 						</Pressable>
 					</View>
 				</ScrollView>
@@ -281,12 +344,12 @@ export default function RegisterScreen() {
 						<FlatList
 							key={pickerStage || 'date-picker'}
 							data={getPickerOptions()}
-							initialScrollIndex={Math.max(0, getPickerOptions().indexOf(pickerValue))}
+							initialScrollIndex={Math.max(0, getPickerOptions().findIndex((option) => option.value === pickerValue))}
 							getItemLayout={(_, index) => ({ length: 64, offset: 64 * index, index })}
-							keyExtractor={(value) => value}
+							keyExtractor={(option) => option.value}
 							renderItem={({ item }) => (
-								<Pressable onPress={() => setPickerValue(item)} style={{ height: 64, borderBottomWidth: 1, borderBottomColor: '#333336', alignItems: 'center', justifyContent: 'center', backgroundColor: item === pickerValue ? '#1e303a' : 'transparent' }}>
-									<Text style={{ color: item === pickerValue ? '#35a2ff' : '#fff', fontSize: 21, fontWeight: item === pickerValue ? '600' : '400' }}>{item}</Text>
+								<Pressable onPress={() => setPickerValue(item.value)} style={{ height: 64, borderBottomWidth: 1, borderBottomColor: '#333336', alignItems: 'center', justifyContent: 'center', backgroundColor: item.value === pickerValue ? '#1e303a' : 'transparent' }}>
+									<Text style={{ color: item.value === pickerValue ? '#35a2ff' : '#fff', fontSize: 21, fontWeight: item.value === pickerValue ? '600' : '400' }}>{item.label}</Text>
 								</Pressable>
 							)}
 						/>
@@ -295,4 +358,4 @@ export default function RegisterScreen() {
 			</Modal>
 		</SafeAreaView>
 	);
-}
+};

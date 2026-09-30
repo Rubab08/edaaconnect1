@@ -261,7 +261,7 @@ export default function LoginScreen({ navigation }) {
             {/* Register Link */}
             <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'center', marginTop: 45 }}>
               <Text style={{ color: '#fff', fontSize: 15 }}>{text.createAccount} </Text>
-              <Pressable onPress={() => Alert.alert(text.register)}>
+              <Pressable onPress={() => router.push('/register')}>
                 <Text style={{ color: '#d8b4fe', fontSize: 15, textDecorationLine: 'underline' }}>{text.register}</Text>
               </Pressable>
             </View>
