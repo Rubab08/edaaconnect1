@@ -12,7 +12,7 @@ export default function HomeScreen({ navigation }) {
         <Pressable
           onPress={() => navigation.openDrawer && navigation.openDrawer()}
           style={styles.menuButton}
-          accessibilityLabel="Open drawer menu"
+          
         >
           <Ionicons name="menu" size={28} color="#fff" />
         </Pressable>
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   subtitle: {
     color: '#dbeafe',
     fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 22,
     marginBottom: 24,
   },
   card: {

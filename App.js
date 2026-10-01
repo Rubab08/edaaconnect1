@@ -14,11 +14,31 @@ const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 function CustomDrawerContent(props) {
+  const drawerItems = [
+    { label: 'Home', target: 'HomeMain' },
+    { label: 'Login', target: 'Login' },
+    { label: 'Register', target: 'Register' },
+  ];
+
   return (
     <DrawerContentScrollView {...props} style={styles.drawerContent}>
       <View style={styles.drawerHeader}>
-        <Text style={styles.drawerTitle}>Hello welcome</Text>
+        <Text style={styles.drawerTitle}>MAIN MENU</Text>
       </View>
+
+      {drawerItems.map((item) => (
+        <View key={item.label} style={styles.drawerItemWrap}>
+          <Text
+            style={styles.drawerItem}
+            onPress={() => {
+          
+              props.navigation.navigate(item.target);
+            }}
+          >
+            {item.label}
+          </Text>
+        </View>
+      ))}
     </DrawerContentScrollView>
   );
 }
@@ -55,15 +75,29 @@ export default function App() {
 
 const styles = StyleSheet.create({
   drawerContent: {
-    backgroundColor: '#a671d4',
+    backgroundColor: '#7e48ae',
+    paddingTop: 12,
   },
   drawerHeader: {
-    padding: 20,
-    marginTop: '20',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
   drawerTitle: {
     color: '#1b0835',
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(27, 8, 53, 0.12)',
+  },
+  drawerItemWrap: {
+    paddingHorizontal: 20,
+    paddingVertical: 40,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(27, 8, 53, 0.12)',
+  },
+  drawerItem: {
+    color: '#1b0835',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
