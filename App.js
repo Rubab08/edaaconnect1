@@ -8,6 +8,7 @@ import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigatio
 import OnboardingScreen from './app/onboarding';
 import LoginScreen from './app/login';
 import RegisterScreen from './app/register';
+import HomeScreen from './app/home';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -22,14 +23,19 @@ function CustomDrawerContent(props) {
   );
 }
 
-function LoginDrawer() {
+function HomeDrawer() {
   return (
     <Drawer.Navigator
-      initialRouteName="LoginMain"
-      screenOptions={{ headerShown: false }}
+      initialRouteName="HomeMain"
+      screenOptions={{
+        headerShown: false,
+        drawerStyle: {
+          width: 220,
+        },
+      }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
-      <Drawer.Screen name="LoginMain" component={LoginScreen} />
+      <Drawer.Screen name="HomeMain" component={HomeScreen} />
     </Drawer.Navigator>
   );
 }
@@ -39,8 +45,9 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Onboarding" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Login" component={LoginDrawer} />
+        <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="Home" component={HomeDrawer} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -51,8 +58,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#a671d4',
   },
   drawerHeader: {
-    padding: 24,
-    marginTop: 20,
+    padding: 20,
+    marginTop: '20',
   },
   drawerTitle: {
     color: '#1b0835',

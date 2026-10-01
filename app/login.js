@@ -132,17 +132,14 @@ export default function LoginScreen({ navigation }) {
       Alert.alert(text.title, text.errMissing);
       return;
     }
-    Alert.alert(text.title, text.successMsg);
-  };
-     const handleOpenDrawer = () => {
-    if (navigation?.openDrawer) {
-      navigation.openDrawer();
-    } else {
-      Alert.alert('Error');
-    }
-  };
 
-
+    Alert.alert(text.title, text.successMsg, [
+      {
+        text: 'OK',
+        onPress: () => navigation.navigate('Home'),
+      },
+    ]);
+  };
   const toggleLanguage = () => setLanguage((prev) => (prev === 'en' ? 'ar' : 'en'));
 
   return (
@@ -171,7 +168,7 @@ export default function LoginScreen({ navigation }) {
             </Pressable>
           </View>
 
-          {/* Top Navigation Row: Back Button + Drawer Menu Button */}
+          {/* Top Navigation Row: Back Button */}
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
             <Pressable
               onPress={() => navigation?.canGoBack?.() && navigation.goBack()}
@@ -180,13 +177,7 @@ export default function LoginScreen({ navigation }) {
               <Ionicons name={isRtl ? 'arrow-forward' : 'arrow-back'} size={26} color="#fff" />
             </Pressable>
 
-            {/* Drawer Menu Button */}
-            <Pressable
-              onPress={handleOpenDrawer}
-              style={{ width: 40, height: 40, alignItems: 'flex-end', justifyContent: 'center' }}
-            >
-              <Ionicons name="menu-outline" size={28} color="#fff" />
-            </Pressable>
+            <View style={{ width: 40, height: 40 }} />
           </View>
 
           {/* Form */}
