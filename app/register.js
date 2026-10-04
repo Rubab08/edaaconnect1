@@ -24,6 +24,11 @@ const copy = {
 		identity: 'National ID / IQAMA',
 		gregorian: 'Gregorian',
 		hijri: 'Hijri',
+		gender: 'Gender',
+		selectGender: 'Select gender',
+		female: 'Female',
+		male: 'Male',
+		other: 'Other',
 		birthDate: 'Date of Birth',
 		year: 'Year',
 		month: 'Month',
@@ -40,6 +45,11 @@ const copy = {
 		identity: 'رقم الهوية / الإقامة',
 		gregorian: 'ميلادي',
 		hijri: 'هجري',
+		gender: 'الجنس',
+		selectGender: 'اختر الجنس',
+		female: 'أنثى',
+		male: 'ذكر',
+		other: 'أخرى',
 		birthDate: 'تاريخ الميلاد',
 		year: 'السنة',
 		month: 'الشهر',
@@ -84,6 +94,7 @@ const dateFields = [
 	{ key: 'month', flex: 1.5, requires: 'year' },
 	{ key: 'day', flex: 1, requires: 'month' },
 ];
+const genderOptions = ['female', 'male', 'other'];
 const glowColumns = [
 	{ left: '5%', height: '18%', width: 25 },
 	{ left: '15%', height: '12%', width: 20 },
@@ -112,6 +123,8 @@ function BackgroundPattern() {
 export default function RegisterScreen({ navigation }) {
 	const [language, setLanguage] = useState('en');
 	const [calendar, setCalendar] = useState('gregorian');
+	const [gender, setGender] = useState('');
+	const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
 	const [form, setForm] = useState({ email: '', mobile: '', identity: '', year: '', month: '', day: '' });
 	const [errors, setErrors] = useState({});
@@ -119,12 +132,19 @@ export default function RegisterScreen({ navigation }) {
 	const [pickerValue, setPickerValue] = useState('');
 	const text = copy[language];
 	const stageLabels = { year: text.year, month: text.month, day: text.day };
+	const genderLabels = { female: text.female, male: text.male, other: text.other };
 
 	function updateForm(field, value) {
 		if (field !== 'email' && !/^\d*$/.test(value)) return;
 		setForm((current) => ({ ...current, [field]: value }));
 		setErrors((current) => ({ ...current, [field]: field === 'mobile' ? value.length < 11 : false }));
 	}
+
+	function selectGender(value) {
+		setGender(value);
+		setIsGenderDropdownOpen(false);
+	}
+
     function changeCalendar(nextCalendar) {
 		setCalendar(nextCalendar);
 		setForm((current) => ({ ...current, year: '', month: '', day: '' }));
@@ -254,6 +274,36 @@ export default function RegisterScreen({ navigation }) {
 
 					<View style={{ marginTop: 60 }}>
 						{formFields.map((field) => renderField(text[field.key], field.key, field.placeholder, field.keyboardType))}
+
+						<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginBottom: 6 }}>{text.gender}</Text>
+						<Pressable
+							accessibilityRole="button"
+							accessibilityLabel={text.gender}
+							accessibilityState={{ expanded: isGenderDropdownOpen }}
+							onPress={() => setIsGenderDropdownOpen((isOpen) => !isOpen)}
+							style={{ height: 35, borderRadius: 8, backgroundColor: '#001d31', paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: isGenderDropdownOpen ? 0 : 10 }}
+						>
+							<Text style={{ color: gender ? '#fff' : '#bca3b4', fontSize: 11 }}>
+								{gender ? genderLabels[gender] : text.selectGender}
+							</Text>
+							<Ionicons name={isGenderDropdownOpen ? 'chevron-up' : 'chevron-down'} size={14} color="#bca3ba" />
+						</Pressable>
+						{isGenderDropdownOpen && (
+							<View style={{ overflow: 'hidden', borderWidth: 1, borderColor: '#8393a8', borderRadius: 8, backgroundColor: '#001d31', marginBottom: 10 }}>
+								{genderOptions.map((option) => (
+									<Pressable
+										key={option}
+										accessibilityRole="button"
+										accessibilityState={{ selected: gender === option }}
+										onPress={() => selectGender(option)}
+										style={{ minHeight: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, backgroundColor: gender === option ? '#1e303a' : 'transparent' }}
+									>
+										<Text style={{ color: '#fff', fontSize: 11 }}>{genderLabels[option]}</Text>
+										{gender === option && <Ionicons name="checkmark" size={16} color="#35a2ff" />}
+									</Pressable>
+								))}
+							</View>
+						)}
 
 						<View style={{ height: 30, borderWidth: 1, borderColor: '#c4d0dc', borderRadius: 9, backgroundColor: '#001d31', flexDirection: 'row', alignItems: 'center', padding: 2, marginBottom: 12 }}>
 							<Pressable accessibilityRole="button" accessibilityState={{ selected: calendar === 'gregorian' }} onPress={() => changeCalendar('gregorian')} style={{ flex: 1, height: 24, borderRadius: 6, backgroundColor: calendar === 'gregorian' ? '#8124ee' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>

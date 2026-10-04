@@ -14,7 +14,7 @@ import RegisterScreen from './app/register';
 import HomeScreen from './app/home';
 import ProfileScreen from './app/profile';
 import SettingsScreen from './app/settings';
-import { FadeIn, FadeInLeft } from 'react-native-reanimated';
+
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
