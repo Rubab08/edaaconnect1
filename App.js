@@ -4,14 +4,21 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 
 import OnboardingScreen from './app/onboarding';
 import LoginScreen from './app/login';
 import RegisterScreen from './app/register';
 import HomeScreen from './app/home';
+import ProfileScreen from './app/profile';
+import SettingsScreen from './app/settings';
+import { FadeIn, FadeInLeft } from 'react-native-reanimated';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
+const Tabs = createBottomTabNavigator();
 
 function CustomDrawerContent(props) {
   const drawerItems = [
@@ -55,8 +62,43 @@ function HomeDrawer() {
       }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
-      <Drawer.Screen name="HomeMain" component={HomeScreen} />
+      <Drawer.Screen name="HomeMain" component={HomeTabs} />
     </Drawer.Navigator>
+  );
+}
+
+function HomeTabs() {
+  return (
+    <Tabs.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarActiveTintColor: '#8b3dff',
+        tabBarInactiveTintColor: '#64748b',
+        tabBarStyle: {
+          height: 68,
+          paddingTop: 8,
+          paddingBottom: 8,
+          borderTopColor: '#e2e8f0',
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
+        tabBarIcon: ({ color, size }) => {
+          const icons = {
+            HomeMain: 'home-outline',
+            Profile: 'person-outline',
+            Settings: 'settings-outline',
+          };
+
+          return <Ionicons name={icons[route.name]} size={size} color={color} />;
+        },
+      })}
+    >
+      <Tabs.Screen name="HomeMain" component={HomeScreen} options={{ tabBarLabel: 'Home' }} />
+      <Tabs.Screen name="Profile" component={ProfileScreen} />
+      <Tabs.Screen name="Settings" component={SettingsScreen} />
+    </Tabs.Navigator>
   );
 }
 

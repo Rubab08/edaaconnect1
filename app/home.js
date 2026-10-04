@@ -10,9 +10,8 @@ export default function HomeScreen({ navigation }) {
 
       <View style={styles.header}>
         <Pressable
-          onPress={() => navigation.openDrawer && navigation.openDrawer()}
+          onPress={() => navigation.getParent()?.openDrawer()}
           style={styles.menuButton}
-          
         >
           <Ionicons name="menu" size={28} color="#fff" />
         </Pressable>
