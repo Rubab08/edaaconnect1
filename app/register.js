@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Dropdown } from 'react-native-element-dropdown';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 import {
 	Alert,
 	FlatList,
@@ -25,6 +26,10 @@ const copy = {
 		identity: 'National ID / IQAMA',
 		gregorian: 'Gregorian',
 		hijri: 'Hijri',
+		cancel: 'Cancel',
+		clearForm: 'Clear Form',
+		deleteAll: 'Delete All',
+		cancelTitle: 'Cancel registration?',
 		gender: 'Gender',
 		selectGender: 'Select gender',
 		female: 'Female',
@@ -46,6 +51,10 @@ const copy = {
 		identity: 'رقم الهوية / الإقامة',
 		gregorian: 'ميلادي',
 		hijri: 'هجري',
+		cancel: 'إلغاء',
+		clearForm: 'مسح النموذج',
+		deleteAll: 'حذف الكل',
+		cancelTitle: 'إلغاء التسجيل؟',
 		gender: 'الجنس',
 		selectGender: 'اختر الجنس',
 		female: 'أنثى',
@@ -95,6 +104,7 @@ const dateFields = [
 	{ key: 'month', flex: 1.5, requires: 'year' },
 	{ key: 'day', flex: 1, requires: 'month' },
 ];
+const emptyForm = { email: '', mobile: '', identity: '', year: '', month: '', day: '' };
 const glowColumns = [
 	{ left: '5%', height: '18%', width: 25 },
 	{ left: '15%', height: '12%', width: 20 },
@@ -121,11 +131,12 @@ function BackgroundPattern() {
 }
 
 export default function RegisterScreen({ navigation }) {
+	const { showActionSheetWithOptions } = useActionSheet();
 	const [language, setLanguage] = useState('en');
 	const [calendar, setCalendar] = useState('gregorian');
 	const [gender, setGender] = useState('');
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
-	const [form, setForm] = useState({ email: '', mobile: '', identity: '', year: '', month: '', day: '' });
+	const [form, setForm] = useState(emptyForm);
 	const [errors, setErrors] = useState({});
 	const [pickerStage, setPickerStage] = useState(null);
 	const [pickerValue, setPickerValue] = useState('');
@@ -136,6 +147,28 @@ export default function RegisterScreen({ navigation }) {
 		if (field !== 'email' && !/^\d*$/.test(value)) return;
 		setForm((current) => ({ ...current, [field]: value }));
 		setErrors((current) => ({ ...current, [field]: field === 'mobile' ? value.length < 11 : false }));
+	}
+
+
+
+	function showCancelActions() {
+		showActionSheetWithOptions({
+			options: [text.cancel, text.clearForm, text.deleteAll],
+			cancelButtonIndex: 0,
+			destructiveButtonIndex: [1, 2],
+			title: text.cancelTitle,
+		}, (selectedIndex) => {
+			if (selectedIndex === 1) {
+				setForm((current) => ({ ...current, email: '', mobile: '', identity: '' }));
+			}
+
+			if (selectedIndex === 2) {
+				setForm({ ...emptyForm });
+				setGender('');
+				setCalendar('gregorian');
+				setAcceptedTerms(false);
+			}
+		});
 	}
 
     function changeCalendar(nextCalendar) {
@@ -343,9 +376,14 @@ export default function RegisterScreen({ navigation }) {
 						</View>
 						{errors.terms && <Text style={{ color: '#ff6676', fontSize: 12, marginTop: -16, marginBottom: 10 }}>{language === 'en' ? 'Please accept the terms.' : 'يرجى الموافقة على الشروط.'}</Text>}
 
-						<Pressable accessibilityRole="button" onPress={submitRegistration} style={{ height: 36, borderRadius: 7, backgroundColor: '#8124ee', alignItems: 'center', justifyContent: 'center', marginTop: 8 }}>
-							<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{text.continue}</Text>
-						</Pressable>
+						<View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
+							<Pressable accessibilityRole="button" onPress={showCancelActions} style={{ height: 36, flex: 1, borderWidth: 1, backgroundColor: '#8124ee', borderRadius: 7, alignItems: 'center', justifyContent: 'center' }}>
+								<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{text.cancel}</Text>
+							</Pressable>
+							<Pressable accessibilityRole="button" onPress={submitRegistration} style={{ height: 36, flex: 1, borderRadius: 7, backgroundColor: '#8124ee', alignItems: 'center', justifyContent: 'center' }}>
+								<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{text.continue}</Text>
+							</Pressable>
+						</View>
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
