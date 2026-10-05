@@ -4,7 +4,9 @@
   "main": "index.js",
   "dependencies": {
     "@expo/react-native-action-sheet": "^4.1.1",
+    "@expo/ui": "~57.0.21",
     "@expo/vector-icons": "^15.0.2",
+    "@react-native-community/datetimepicker": "9.1.0",
     "@react-native-vector-icons/lucide": "^13.1.4",
     "@react-navigation/bottom-tabs": "^7.20.0",
     "@react-navigation/drawer": "^7.14.3",

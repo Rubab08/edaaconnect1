@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import {
 	Alert,
-	FlatList,
 	KeyboardAvoidingView,
 	Modal,
 	Platform,
@@ -24,8 +24,6 @@ const copy = {
 		email: 'Email',
 		mobile: 'Mobile Number',
 		identity: 'National ID / IQAMA',
-		gregorian: 'Gregorian',
-		hijri: 'Hijri',
 		cancel: 'Cancel',
 		clearForm: 'Clear Form',
 		deleteAll: 'Delete All',
@@ -36,9 +34,6 @@ const copy = {
 		male: 'Male',
 		other: 'Other',
 		birthDate: 'Date of Birth',
-		year: 'Year',
-		month: 'Month',
-		day: 'Day',
 		terms: 'Agree to the',
 		termsLink: 'Terms & Conditions',
 		continue: 'Continue',
@@ -49,8 +44,6 @@ const copy = {
 		email: 'البريد الإلكتروني',
 		mobile: 'رقم الجوال',
 		identity: 'رقم الهوية / الإقامة',
-		gregorian: 'ميلادي',
-		hijri: 'هجري',
 		cancel: 'إلغاء',
 		clearForm: 'مسح النموذج',
 		deleteAll: 'حذف الكل',
@@ -61,9 +54,6 @@ const copy = {
 		male: 'ذكر',
 		other: 'أخرى',
 		birthDate: 'تاريخ الميلاد',
-		year: 'السنة',
-		month: 'الشهر',
-		day: 'اليوم',
 		terms: 'أوافق على',
 		termsLink: 'الشروط والأحكام',
 		continue: 'متابعة',
@@ -77,32 +67,10 @@ const fieldErrorMessages = {
 };
 
 const currentYear = new Date().getFullYear();
-const yearOptions = Array.from({ length: currentYear - 1899 }, (_, index) => String(currentYear - index));
-const hijriYearOptions = Array.from({ length: 1448 - 1358 + 1 }, (_, index) => String(1358 + index));
-const monthOptions = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, '0'));
-const hijriMonthOptions = [
-	{ value: '01', label: 'Muharram' },
-	{ value: '02', label: 'Safar' },
-	{ value: '03', label: 'Rabi I' },
-	{ value: '04', label: 'Rabi II' },
-	{ value: '05', label: 'Jumada I' },
-	{ value: '06', label: 'Jumada II' },
-	{ value: '07', label: 'Rajab' },
-	{ value: '08', label: "Sha'ban" },
-	{ value: '09', label: 'Ramadan' },
-	{ value: '10', label: 'Shawwal' },
-	{ value: '11', label: "Dhu al-Qi'dah" },
-	{ value: '12', label: 'Dhu al-Hijjah' },
-];
 const formFields = [
 	{ key: 'email', placeholder: 'email@domain.com', keyboardType: 'email-address' },
 	{ key: 'mobile', placeholder: '9665xxxxxx', keyboardType: 'phone-pad' },
 	{ key: 'identity', placeholder: 'National ID / IQAMA', keyboardType: 'alphanumeric' },
-];
-const dateFields = [
-	{ key: 'year', flex: 1 },
-	{ key: 'month', flex: 1.5, requires: 'year' },
-	{ key: 'day', flex: 1, requires: 'month' },
 ];
 const emptyForm = { email: '', mobile: '', identity: '', year: '', month: '', day: '' };
 const glowColumns = [
@@ -133,15 +101,13 @@ function BackgroundPattern() {
 export default function RegisterScreen({ navigation }) {
 	const { showActionSheetWithOptions } = useActionSheet();
 	const [language, setLanguage] = useState('en');
-	const [calendar, setCalendar] = useState('gregorian');
 	const [gender, setGender] = useState('');
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
 	const [form, setForm] = useState(emptyForm);
 	const [errors, setErrors] = useState({});
-	const [pickerStage, setPickerStage] = useState(null);
-	const [pickerValue, setPickerValue] = useState('');
+	const [datePickerVisible, setDatePickerVisible] = useState(false);
+	const [datePickerValue, setDatePickerValue] = useState(new Date(currentYear - 25, 0, 1));
 	const text = copy[language];
-	const stageLabels = { year: text.year, month: text.month, day: text.day };
 
 	function updateForm(field, value) {
 		if (field !== 'email' && !/^\d*$/.test(value)) return;
@@ -165,16 +131,10 @@ export default function RegisterScreen({ navigation }) {
 			if (selectedIndex === 2) {
 				setForm({ ...emptyForm });
 				setGender('');
-				setCalendar('gregorian');
 				setAcceptedTerms(false);
+				setDatePickerVisible(false);
 			}
 		});
-	}
-
-    function changeCalendar(nextCalendar) {
-		setCalendar(nextCalendar);
-		setForm((current) => ({ ...current, year: '', month: '', day: '' }));
-		setErrors((current) => ({ ...current, year: false, month: false, day: false }));
 	}
 
 	function submitRegistration() {
@@ -195,58 +155,41 @@ export default function RegisterScreen({ navigation }) {
 		Alert.alert(text.title, language === 'en' ? 'Your registration details are ready.' : 'بيانات التسجيل جاهزة.');
 	}
 
-	function openDatePicker(stage) {
-		const dateField = dateFields.find((field) => field.key === stage);
-		if (!dateField || (dateField.requires && !form[dateField.requires])) return;
-
-		const fallbackValue = stage === 'year'
-			? calendar === 'hijri' ? '1358' : String(currentYear - 25)
-			: '01';
-		setPickerValue(form[stage] || fallbackValue);
-		setPickerStage(stage);
+	function openDatePicker() {
+		const currentDate = form.year && form.month && form.day
+			? new Date(Number(form.year), Number(form.month) - 1, Number(form.day))
+			: new Date(currentYear - 25, 0, 1);
+		setDatePickerValue(currentDate > new Date() ? new Date() : currentDate);
+		setDatePickerVisible(true);
 	}
 
-	function confirmDateSelection() {
-		if (!pickerStage || !pickerValue) return;
-
-		const completedStage = pickerStage;
+	function applySelectedDate(date) {
 		setForm((current) => ({
 			...current,
-			[completedStage]: pickerValue,
-			...(completedStage === 'year' ? { month: '', day: '' } : {}),
-			...(completedStage === 'month' ? { day: '' } : {}),
+			year: String(date.getFullYear()),
+			month: String(date.getMonth() + 1).padStart(2, '0'),
+			day: String(date.getDate()).padStart(2, '0'),
 		}));
 		setErrors((current) => ({ ...current, year: false, month: false, day: false }));
+	}
 
-		if (completedStage === 'year') {
-			setPickerStage('month');
-			setPickerValue('01');
-		} else if (completedStage === 'month') {
-			setPickerStage('day');
-			setPickerValue('01');
-		} else {
-			setPickerStage(null);
+	function handleNativeDateChange(event, selectedDate) {
+		if (Platform.OS === 'android') {
+			setDatePickerVisible(false);
+			if (event.type === 'set' && selectedDate) {
+				applySelectedDate(selectedDate);
+			}
+			return;
+		}
+
+		if (selectedDate) {
+			setDatePickerValue(selectedDate);
 		}
 	}
 
-	function getPickerOptions() {
-		if (pickerStage === 'year') {
-			const years = calendar === 'hijri' ? hijriYearOptions : yearOptions;
-			return years.map((value) => ({ value, label: value }));
-		}
-		if (pickerStage === 'month') {
-			if (calendar === 'hijri') return hijriMonthOptions;
-			return monthOptions.map((value) => ({ value, label: value }));
-		}
-
-		const daysInMonth = calendar === 'hijri'
-			? 30
-			: form.month ? new Date(Number(form.year), Number(form.month), 0).getDate() : 31;
-		return Array.from({ length: daysInMonth }, (_, index) => {
-			const value = String(index + 1).padStart(2, '0');
-			return { value, label: value };
-		});
-	}
+	const birthDateValue = form.year && form.month && form.day
+		? `${form.day}/${form.month}/${form.year}`
+		: '—';
 
 	function renderField(label, field, placeholder, keyboardType = 'default') {
 		return (
@@ -328,40 +271,18 @@ export default function RegisterScreen({ navigation }) {
 							)}
 						/>
 
-						<View style={{ height: 30, borderWidth: 1, borderColor: '#c4d0dc', borderRadius: 9, backgroundColor: '#001d31', flexDirection: 'row', alignItems: 'center', padding: 2, marginBottom: 12 }}>
-							<Pressable accessibilityRole="button" accessibilityState={{ selected: calendar === 'gregorian' }} onPress={() => changeCalendar('gregorian')} style={{ flex: 1, height: 24, borderRadius: 6, backgroundColor: calendar === 'gregorian' ? '#8124ee' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-								<Text style={{ color: '#fff', fontSize: 10 }}>{text.gregorian}</Text>
-							</Pressable>
-							<Pressable accessibilityRole="button" accessibilityState={{ selected: calendar === 'hijri' }} onPress={() => changeCalendar('hijri')} style={{ flex: 1, height: 24, borderRadius: 6, backgroundColor: calendar === 'hijri' ? '#8124ee' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-								<Text style={{ color: '#fff', fontSize: 10 }}>{text.hijri}</Text>
-							</Pressable>
-						</View>
-
 						<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginBottom: 6 }}>{text.birthDate}</Text>
-						<View style={{ flexDirection: 'row', gap: 6 }}>
-							{dateFields.map((dateField) => {
-								const disabled = Boolean(dateField.requires && !form[dateField.requires]);
-								const hijriMonth = dateField.key === 'month' && calendar === 'hijri'
-									? hijriMonthOptions.find((month) => month.value === form.month)?.label
-									: null;
-								const value = hijriMonth || form[dateField.key] || '—';
-								return (
-								<View key={dateField.key} style={{ flex: dateField.flex }}>
-									<Text style={{ color: '#d5d8e7', fontSize: 10, fontWeight: '600', textAlign: 'center', marginBottom: 4 }}>{text[dateField.key]}</Text>
-									<Pressable
-										accessibilityRole="button"
-										accessibilityState={{ disabled }}
-										disabled={disabled}
-										onPress={() => openDatePicker(dateField.key)}
-										style={{ height: 34, borderWidth: 1, borderColor: '#8393a8', borderRadius: 7, backgroundColor: '#001d31', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, opacity: disabled ? 0.45 : 1 }}
-									>
-										<Text style={{ flex: 1, color: form[dateField.key] ? '#fff' : '#9eafbd', fontSize: 11, textAlign: 'center' }}>{value}</Text>
-										<Ionicons name="chevron-down" size={12} color="#a3afbc" />
-									</Pressable>
-								</View>
-								);
-							})}
-						</View>
+						<Pressable
+							accessibilityRole="button"
+							accessibilityLabel={text.birthDate}
+							onPress={openDatePicker}
+							style={{ height: 35, borderWidth: 1, borderColor: '#8393a8', borderRadius: 8, backgroundColor: '#001d31', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12 }}
+						>
+							<Text style={{ flex: 1, color: birthDateValue === '—' ? '#9eafbd' : '#fff', fontSize: 11 }}>
+								{birthDateValue}
+							</Text>
+							<Ionicons name="calendar-outline" size={15} color="#a3afbc" />
+						</Pressable>
 						{(errors.year || errors.month || errors.day) && <Text style={{ color: '#ff6676', fontSize: 12, marginTop: 4 }}>Please Enter Date Of Birth</Text>}
 
 						<View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 14, marginBottom: 14 }}>
@@ -387,31 +308,53 @@ export default function RegisterScreen({ navigation }) {
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
-			<Modal visible={Boolean(pickerStage)} transparent animationType="slide" onRequestClose={() => setPickerStage(null)}>
-				<View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.58)' }}>
-					<Pressable onPress={() => setPickerStage(null)} style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }} />
-					<View style={{ height: '62%', backgroundColor: '#1d1d1f', borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12 }}>
-						<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#3a3a3c' }}>
-							<Text style={{ color: '#fff', fontSize: 20, fontWeight: '600' }}>{stageLabels[pickerStage] || ''}</Text>
-							<Pressable accessibilityRole="button" onPress={confirmDateSelection}>
-								<Text style={{ color: '#35a2ff', fontSize: 18, fontWeight: '600' }}>{language === 'en' ? 'Done' : 'تم'}</Text>
-							</Pressable>
-						</View>
-						<FlatList
-							key={pickerStage || 'date-picker'}
-							data={getPickerOptions()}
-							initialScrollIndex={Math.max(0, getPickerOptions().findIndex((option) => option.value === pickerValue))}
-							getItemLayout={(_, index) => ({ length: 64, offset: 64 * index, index })}
-							keyExtractor={(option) => option.value}
-							renderItem={({ item }) => (
-								<Pressable onPress={() => setPickerValue(item.value)} style={{ height: 64, borderBottomWidth: 1, borderBottomColor: '#333336', alignItems: 'center', justifyContent: 'center', backgroundColor: item.value === pickerValue ? '#1e303a' : 'transparent' }}>
-									<Text style={{ color: item.value === pickerValue ? '#35a2ff' : '#fff', fontSize: 21, fontWeight: item.value === pickerValue ? '600' : '400' }}>{item.label}</Text>
-								</Pressable>
-							)}
+			{datePickerVisible && Platform.OS === 'android' && (
+				<DateTimePicker
+					value={datePickerValue}
+					mode="date"
+					display="default"
+					minimumDate={new Date(1900, 0, 1)}
+					maximumDate={new Date()}
+					onChange={handleNativeDateChange}
+				/>
+			)}
+			{Platform.OS === 'ios' && (
+				<Modal
+					visible={datePickerVisible}
+					transparent
+					animationType="slide"
+					onRequestClose={() => setDatePickerVisible(false)}
+				>
+					<View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.58)' }}>
+						<Pressable
+							onPress={() => setDatePickerVisible(false)}
+							style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
 						/>
+						<View style={{ backgroundColor: '#1d1d1f', borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingHorizontal: 20, paddingTop: 18, paddingBottom: 24 }}>
+							<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 12 }}>
+								<Pressable accessibilityRole="button" onPress={() => setDatePickerVisible(false)}>
+									<Text style={{ color: '#35a2ff', fontSize: 17 }}>{text.cancel}</Text>
+								</Pressable>
+								<Text style={{ color: '#fff', fontSize: 17, fontWeight: '600' }}>{text.birthDate}</Text>
+								<Pressable accessibilityRole="button" onPress={() => {
+									applySelectedDate(datePickerValue);
+									setDatePickerVisible(false);
+								}}>
+									<Text style={{ color: '#35a2ff', fontSize: 17, fontWeight: '600' }}>{language === 'en' ? 'Done' : 'تم'}</Text>
+								</Pressable>
+							</View>
+							<DateTimePicker
+								value={datePickerValue}
+								mode="date"
+								display="spinner"
+								minimumDate={new Date(1900, 0, 1)}
+								maximumDate={new Date()}
+								onChange={handleNativeDateChange}
+							/>
+						</View>
 					</View>
-				</View>
-			</Modal>
+				</Modal>
+			)}
 		</SafeAreaView>
 	);
 };
