@@ -27,6 +27,7 @@ const slides = [
 ];
 
 export default function ProfileScreen() {
+	const [currentSlide, setCurrentSlide] = useState(0);
 	const { width } = useWindowDimensions();
 	const carouselWidth = Math.max(width - 40, 0);
 
@@ -42,13 +43,21 @@ export default function ProfileScreen() {
 					<Carousel
 						data={slides}
 						style={{ width: carouselWidth, height: 380 }}
+						layout={{ type: 'parallax', offset: 70, scale: 0.85, adjacentScale: 0.67 }}
 						loop
-						autoplay={false}
+						autoplay 
+						autoplayInterval={3000}
+						animation={{ type: 'timing', duration: 650 }}
 						keyExtractor={(item) => item.id}
+						onSnapToItem={setCurrentSlide}
 						renderItem={({ item }) => (
 							<View style={styles.slide}>
 								<View style={styles.imageContainer}>
-									<Image source={item.image} style={styles.image} />
+									<Image
+										source={item.image}
+										style={styles.image}
+										blurRadius={item.id === slides[currentSlide].id ? 0 : 5}
+									/>
 									<View style={styles.imageCaption}>
 										<Text style={styles.imageTitle}>{item.title}</Text>
 									</View>
