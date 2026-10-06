@@ -9,27 +9,13 @@ import {
 	View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLanguage } from '../components/providers/LanguageContext';
 
-const copy = {
-	en: {
-		title: 'Welcome',
-		language: 'العربية',
-		login: 'Login',
-		createAccount: 'Create Investment Account',
-		copyright: 'Copy right – Edaa (From Saudi Tadawul Group) 2026',
-	},
-	ar: {
-		title: 'مرحبًا',
-		language: 'English',
-		login: 'دخول',
-		createAccount: 'إنشاء حساب استثماري',
-		copyright: 'إيداع – مجموعة تداول السعودية 2026',
-	},
-};
 
 export default function OnboardingScreen({ navigation }) {
-	const [language, setLanguage] = useState('en');
-	const text = copy[language];
+
+
+	const {t, language, toggleLanguage } = useLanguage();
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#1e2343' }} edges={['top', 'bottom']}>

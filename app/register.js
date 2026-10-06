@@ -16,49 +16,8 @@ import {
 	View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from '../components/providers/LanguageContext';
 
-const copy = {
-	en: {
-		title: 'Sign Up',
-		language: 'العربية',
-		email: 'Email',
-		mobile: 'Mobile Number',
-		identity: 'National ID / IQAMA',
-		cancel: 'Cancel',
-		clearForm: 'Clear Form',
-		deleteAll: 'Delete All',
-		cancelTitle: 'Cancel registration?',
-		gender: 'Gender',
-		selectGender: 'Select gender',
-		female: 'Female',
-		male: 'Male',
-		other: 'Other',
-		birthDate: 'Date of Birth',
-		terms: 'Agree to the',
-		termsLink: 'Terms & Conditions',
-		continue: 'Continue',
-	},
-	ar: {
-		title: 'إنشاء حساب',
-		language: 'English',
-		email: 'البريد الإلكتروني',
-		mobile: 'رقم الجوال',
-		identity: 'رقم الهوية / الإقامة',
-		cancel: 'إلغاء',
-		clearForm: 'مسح النموذج',
-		deleteAll: 'حذف الكل',
-		cancelTitle: 'إلغاء التسجيل؟',
-		gender: 'الجنس',
-		selectGender: 'اختر الجنس',
-		female: 'أنثى',
-		male: 'ذكر',
-		other: 'أخرى',
-		birthDate: 'تاريخ الميلاد',
-		terms: 'أوافق على',
-		termsLink: 'الشروط والأحكام',
-		continue: 'متابعة',
-	},
-};
 
 const fieldErrorMessages = {
 	email: 'Please Enter Valid Email',
@@ -100,14 +59,15 @@ function BackgroundPattern() {
 
 export default function RegisterScreen({ navigation }) {
 	const { showActionSheetWithOptions } = useActionSheet();
-	const [language, setLanguage] = useState('en');
+
+	const { t, language, toggleLanguage, isRtl } = useTranslation();
 	const [gender, setGender] = useState('');
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
 	const [form, setForm] = useState(emptyForm);
 	const [errors, setErrors] = useState({});
 	const [datePickerVisible, setDatePickerVisible] = useState(false);
 	const [datePickerValue, setDatePickerValue] = useState(new Date(currentYear - 25, 0, 1));
-	const text = copy[language];
+	
 
 	function updateForm(field, value) {
 		if (field !== 'email' && !/^\d*$/.test(value)) return;

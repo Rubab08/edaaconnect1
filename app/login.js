@@ -16,45 +16,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '../components/providers/UserContext';
+import { useLanguage } from '../components/providers/LanguageContext';
+import { useTranslation } from '../components/providers/LanguageContext';
 
-const copy = {
-  en: {
-    title: 'Login',
-    language: 'العربية',
-    identity: 'National ID / IQAMA',
-    password: 'Password',
-    identityPlaceholder: 'Enter National ID / IQAMA',
-    passwordPlaceholder: 'Enter Password',
-    keepSignedIn: 'Keep me signed in',
-    forgotPassword: 'Forgot Password',
-    login: 'Login',
-    or: 'OR',
-    biometric: 'Biometric',
-    createAccount: 'Create new account?',
-    register: 'Register',
-    copyright: 'Copy right – Edaa (From Saudi Tadawul Group) 2026',
-    errMissing: 'Enter your ID and password to continue.',
-    successMsg: 'Your sign-in request is ready.',
-  },
-  ar: {
-    title: 'تسجيل الدخول',
-    language: 'English',
-    identity: 'رقم الهوية / الإقامة',
-    password: 'كلمة المرور',
-    identityPlaceholder: 'أدخل رقم الهوية / الإقامة',
-    passwordPlaceholder: 'أدخل كلمة المرور',
-    keepSignedIn: 'تذكرني',
-    forgotPassword: 'نسيت كلمة المرور',
-    login: 'دخول',
-    or: 'أو',
-    biometric: 'دخول بالبصمة',
-    createAccount: 'ليس لديك حساب؟',
-    register: 'سجل الآن',
-    copyright: 'إيداع – مجموعة تداول السعودية 2026',
-    errMissing: 'أدخل رقم الهوية وكلمة المرور للمتابعة.',
-    successMsg: 'طلب تسجيل الدخول جاهز.',
-  },
-};
 
 function BackgroundPattern() {
   return (
@@ -123,26 +87,25 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
-  const [language, setLanguage] = useState('en');
   const { setNin } = useUser();
-
-  const text = copy[language];
-  const isRtl = language === 'ar';
+  const { t, toggleLanguage, isRtl } = useTranslation();
+  
+  
+  
 
   const handleLogin = () => {
     if (!identity.trim() || !password) {
-      Alert.alert(text.title, text.errMissing);
+      Alert.alert(t('loginTitle'), t('errMissing'));
       return;
     }
      setNin(identity.trim());
-    Alert.alert(text.title, text.successMsg, [
+    Alert.alert(t('loginTitle'), t('successMsg'), [
       {
         text: 'OK',
         onPress: () => navigation.navigate('Home'),
       },
     ]);
   };
-  const toggleLanguage = () => setLanguage((prev) => (prev === 'en' ? 'ar' : 'en'));
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0f143a' }} edges={['top', 'bottom']}>

@@ -8,11 +8,13 @@ import AppNavigator from './components/navigation/AppNavigator';
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <LanguageProvider>
       <UserProvider>
         <ActionSheetProvider>
           <AppNavigator />
         </ActionSheetProvider>
       </UserProvider>
+</LanguageProvider>
     </GestureHandlerRootView>
   );
 }

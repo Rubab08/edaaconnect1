@@ -4,6 +4,8 @@ import { Carousel } from 'react-native-reanimated-carousel';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../components/providers/UserContext';
 
+
+
 const slides = [
 	{
 		id: 'flower1',
