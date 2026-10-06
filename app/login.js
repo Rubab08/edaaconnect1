@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useUser } from '../components/providers/UserContext';
 
 const copy = {
   en: {
@@ -123,6 +124,7 @@ export default function LoginScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
   const [language, setLanguage] = useState('en');
+  const { setNin } = useUser();
 
   const text = copy[language];
   const isRtl = language === 'ar';
@@ -132,7 +134,7 @@ export default function LoginScreen({ navigation }) {
       Alert.alert(text.title, text.errMissing);
       return;
     }
-
+     setNin(identity.trim());
     Alert.alert(text.title, text.successMsg, [
       {
         text: 'OK',

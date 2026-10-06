@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Image, ScrollView, StatusBar, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { Carousel } from 'react-native-reanimated-carousel';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useUser } from '../components/providers/UserContext';
 
 const slides = [
 	{
@@ -31,11 +32,16 @@ export default function ProfileScreen() {
 	const { width } = useWindowDimensions();
 	const carouselWidth = Math.max(width - 40, 0);
 
+	const { nin } = useUser();
+
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			<StatusBar barStyle="light-content" backgroundColor="#09156e" />
 			<ScrollView contentContainerStyle={styles.content}>
 				<View style={styles.heading}>
+					<Text style={styles.eyebrow}>
+						NIN: {nin ? nin : 'Not Logged In'}
+					</Text>
 					<Text style={styles.title}>FLOWERS</Text>
 				</View>
 
