@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState,useCallback } from 'react';
 import { Image, ScrollView, StatusBar, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { Carousel } from 'react-native-reanimated-carousel';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../components/providers/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 
@@ -33,17 +35,50 @@ export default function ProfileScreen() {
 	const [currentSlide, setCurrentSlide] = useState(0);
 	const { width } = useWindowDimensions();
 	const carouselWidth = Math.max(width - 40, 0);
+	const [storedIdentity, setStoredIdentity] = useState('');
+	const [storedPassword, setStoredPassword] = useState('');
+const { nin } = useUser();
 
-	const { nin } = useUser();
+useFocusEffect(
+		useCallback(() => {
+			const loadCredentials = async () => {
+				try {
+					const savedId = await AsyncStorage.getItem('saved_identity');
+					const savedPass = await AsyncStorage.getItem('saved_password');
+					
+					if (savedId !== null) setStoredIdentity(savedId);
+					if (savedPass !== null) setStoredPassword(savedPass);
+				} catch (error) {
+					console.error('Error loading credentials', error);
+				}
+			};
+
+			loadCredentials();
+		}, [])
+	);
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			<StatusBar barStyle="light-content" backgroundColor="#09156e" />
 			<ScrollView contentContainerStyle={styles.content}>
 				<View style={styles.heading}>
-					<Text style={styles.eyebrow}>
-						NIN: {nin ? nin : 'Not Logged In'}
-					</Text>
+					
+                 {/*  Identity  */}
+        <Text style={styles.eyebrow}>
+            STORED ID: {storedIdentity ? storedIdentity : 'None'}
+        </Text>
+        
+        {/*   Password  */}
+        <Text style={styles.eyebrow}>
+            STORED PASS: {storedPassword ? storedPassword : 'None'}
+        </Text>
+
+        <Text style={styles.title}>FLOWERS</Text>
+    </View>
+
+    <View style={styles.carouselFrame}>
+
+
 					<Text style={styles.title}>FLOWERS</Text>
 				</View>
 

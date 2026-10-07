@@ -16,8 +16,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '../components/providers/UserContext';
-import { useLanguage } from '../components/providers/LanguageContext';
 import { useTranslation } from '../components/providers/LanguageContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 function BackgroundPattern() {
@@ -88,17 +88,39 @@ export default function LoginScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
   const { setNin } = useUser();
-  const { t, toggleLanguage, isRtl } = useTranslation();
-  
-  
-  
+  const { t, language, toggleLanguage, isRtl } = useTranslation();
 
-  const handleLogin = () => {
+  const text = {
+    title: t('loginTitle'),
+    language: language === 'en' ? 'العربية' : 'English',
+    identity: t('identity'),
+    identityPlaceholder: t('identityPlaceholder'),
+    password: t('password'),
+    passwordPlaceholder: t('passwordPlaceholder'),
+    keepSignedIn: t('keepSignedIn'),
+    forgotPassword: t('forgotPassword'),
+    login: t('loginBtn'),
+    or: t('or'),
+    biometric: t('biometric'),
+    createAccount: t('createAccountPrompt'),
+    register: t('register'),
+    copyright: t('copyright') || '© Edaa Connect',
+  };
+
+  const handleLogin = async () => {
     if (!identity.trim() || !password) {
-      Alert.alert(t('loginTitle'), t('errMissing'));
+      Alert.alert(text.title, text.errMissing);
       return;
     }
-     setNin(identity.trim());
+
+    try {
+      await AsyncStorage.setItem('saved_identity', identity.trim());
+      await AsyncStorage.setItem('saved_password', password);
+    } catch (error) {
+      console.error('Error saving data', error);
+    }
+
+    setNin(identity.trim());
     Alert.alert(t('loginTitle'), t('successMsg'), [
       {
         text: 'OK',

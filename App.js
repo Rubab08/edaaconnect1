@@ -3,6 +3,7 @@ import React from 'react';
 import ActionSheetProvider from './components/providers/ActionSheetProvider';
 import { UserProvider } from './components/providers/UserContext';
 import AppNavigator from './components/navigation/AppNavigator';
+import { LanguageProvider } from './components/providers/LanguageContext';
 
 
 export default function App() {

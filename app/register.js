@@ -60,7 +60,29 @@ function BackgroundPattern() {
 export default function RegisterScreen({ navigation }) {
 	const { showActionSheetWithOptions } = useActionSheet();
 
-	const { t, language, toggleLanguage, isRtl } = useTranslation();
+	const { t, language, toggleLanguage } = useTranslation();
+	const text = {
+		title: t('signUpTitle'),
+		language: language === 'en' ? 'العربية' : 'English',
+		cancel: t('cancel'),
+		clearForm: t('clearForm'),
+		deleteAll: t('deleteAll'),
+		cancelTitle: t('cancelTitle'),
+		email: t('email'),
+		mobile: t('mobile'),
+		identity: t('identity'),
+		gender: t('gender'),
+		selectGender: t('selectGender'),
+		female: t('female'),
+		male: t('male'),
+		other: t('other'),
+		birthDate: t('birthDate'),
+		terms: t('terms'),
+		termsLink: t('termsLink'),
+		continue: t('continue'),
+		done: t('done'),
+		copyright: t('copyright') || '© Edaa Connect',
+	};
 	const [gender, setGender] = useState('');
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
 	const [form, setForm] = useState(emptyForm);
@@ -179,7 +201,7 @@ export default function RegisterScreen({ navigation }) {
 				<ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingTop: 4, paddingBottom: 12}} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 					<View style={{ height: 32, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
 						<Text style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', color: '#fff', fontSize: 16, fontWeight: '700' }}>{text.title}</Text>
-						<Pressable accessibilityRole="button" accessibilityLabel={language === 'en' ? 'Change language' : 'تغيير اللغة'} onPress={() => setLanguage(language === 'en' ? 'ar' : 'en')} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, zIndex: 1 }}>
+						<Pressable accessibilityRole="button" accessibilityLabel={language === 'en' ? 'Change language' : 'تغيير اللغة'} onPress={toggleLanguage} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, zIndex: 1 }}>
 							<Ionicons name="sunny-outline" size={18} color="#fff" />
 							<Text style={{ color: '#fff', fontSize: 11 }}>{text.language}</Text>
 						</Pressable>

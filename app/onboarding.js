@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {
-	Alert,
 	Image,
 	Pressable,
 	StatusBar,
@@ -9,13 +7,19 @@ import {
 	View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLanguage } from '../components/providers/LanguageContext';
+import { useTranslation } from '../components/providers/LanguageContext';
+
 
 
 export default function OnboardingScreen({ navigation }) {
-
-
-	const {t, language, toggleLanguage } = useLanguage();
+	const { t, language, toggleLanguage } = useTranslation();
+	const text = {
+		title: t('welcomeTitle'),
+		language: language === 'en' ? 'العربية' : 'English',
+		login: t('loginBtn'),
+		createAccount: t('createAccountPrompt'),
+		copyright: t('copyright') || '© Edaa Connect',
+	};
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#1e2343' }} edges={['top', 'bottom']}>
@@ -26,7 +30,7 @@ export default function OnboardingScreen({ navigation }) {
 					<Pressable
 						accessibilityRole="button"
 						accessibilityLabel={language === 'en' ? 'Change language' : 'تغيير اللغة'}
-						onPress={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+						onPress={toggleLanguage}
 						style={{ flexDirection: 'row', alignItems: 'center', gap: 8, zIndex: 1 }}
 					>
 						<Ionicons name="sunny" size={24} color="#fff" />
