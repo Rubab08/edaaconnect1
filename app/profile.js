@@ -15,19 +15,19 @@
  import { SafeAreaView } from 'react-native-safe-area-context';
  import AsyncStorage from '@react-native-async-storage/async-storage';
  import { useFocusEffect } from '@react-navigation/native';
- import * as Notifications from 'expo-notifications';
+ //import * as Notifications from 'expo-notifications';
  import { useUser } from '../components/providers/UserContext';
  import { useTranslation } from '../components/providers/LanguageContext';
 
- Notifications.setNotificationHandler({
-   handleNotification: async () => ({
+  /*Notifications.setNotificationHandler({
+    handleNotification: async () => ({
      shouldShowAlert: true,
      shouldPlaySound: true,
      shouldSetBadge: false,
      shouldShowBanner: true,
      shouldShowList: true,
    }),
- });
+ });*/
 
  const slides = [
    { id: 'flower1', title: 'Daisy', image: require('../assets/flower1.png') },
@@ -71,7 +71,7 @@
      }, [])
    );
 
-   const handleWelcomeNotification = async () => {
+  /*const handleWelcomeNotification = async () => {
      if (Platform.OS !== 'ios') return;
 
        try {
@@ -90,7 +90,7 @@
          Alert.alert('Notification error', 'The notification could not be scheduled.');
        }
    };
-
+*/
    return (
      <SafeAreaView style={styles.safeArea}>
        <StatusBar barStyle="light-content" backgroundColor="#09156e" />
@@ -176,7 +176,7 @@
      fontSize: 28,
      fontWeight: '800',
    },
-   notificationsBtn: {
+  /* notificationsBtn: {
      backgroundColor: '#8b3dff',
      paddingVertical: 14,
      paddingHorizontal: 24,
@@ -190,7 +190,7 @@
      color: '#ffffff',
      fontSize: 16,
      fontWeight: '700',
-   },
+   },*/
    carouselFrame: {
      width: '100%',
      alignItems: 'center',

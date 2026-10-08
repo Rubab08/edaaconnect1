@@ -102,6 +102,12 @@ export default function LoginScreen({ navigation }) {
     login: t('loginBtn'),
     or: t('or'),
     biometric: t('biometric'),
+    faceId: t('faceId'),
+    faceIdPrompt: t('faceIdPrompt'),
+    faceIdUnavailable: t('faceIdUnavailable'),
+    biometricUnavailable: t('biometricUnavailable'),
+    biometricFailed: t('biometricFailed'),
+    biometricPrompt: t('biometricPrompt'),
     createAccount: t('createAccountPrompt'),
     register: t('register'),
     copyright: t('copyright') || '© Edaa Connect',
@@ -127,6 +133,48 @@ export default function LoginScreen({ navigation }) {
 
     if (auth.success) {
         navigation.navigate('Home');
+    }
+  };
+
+
+
+  const handleFaceIdLogin = async () => {
+    if (Platform.OS === 'web') {
+      Alert.alert(text.title, text.faceIdUnavailable);
+      return;
+    }
+
+    try {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
+
+      if (
+        !hasHardware ||
+        !isEnrolled ||
+        !supportedTypes.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)
+      ) {
+        Alert.alert(text.title, text.faceIdUnavailable);
+        return;
+      }
+
+      const auth = await LocalAuthentication.authenticateAsync({
+        promptMessage: text.faceIdPrompt,
+        disableDeviceFallback: true,
+        ...(Platform.OS === 'android' && {
+          biometricsSecurityLevel: 'weak',
+          promptDescription: text.faceIdPrompt,
+        }),
+      });
+
+      if (auth.success) {
+        navigation.navigate('Home');
+      } else if (!['user_cancel', 'app_cancel', 'system_cancel'].includes(auth.error)) {
+        Alert.alert(text.title, text.biometricFailed);
+      }
+    } catch (error) {
+      console.error('Face ID login failed', error);
+      Alert.alert(text.title, text.biometricFailed);
     }
   };
 
@@ -274,6 +322,16 @@ export default function LoginScreen({ navigation }) {
                 <Ionicons name="finger-print-outline" size={32} color="#f8fafc" />
               </View>
               <Text style={{ color: '#fff', fontSize: 15, marginTop: 10 }}>{text.biometric}</Text>
+            </Pressable>
+
+            {/* Face ID Button */}
+            <Pressable onPress={handleFaceIdLogin} style={{ alignSelf: 'center', alignItems: 'center', marginTop: 10 }}>
+              <View style={{ width: 75, height: 60, borderWidth: 1, borderColor: '#f8fafc', borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="scan-outline" size={32} color="#f8fafc" />
+              </View>
+              <Text style={{ color: '#fff', fontSize: 15, marginTop: 10 }}>
+                {text.faceId}
+              </Text>
             </Pressable>
 
             
