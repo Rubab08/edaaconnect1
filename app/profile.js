@@ -1,181 +1,229 @@
-import React, { useState,useCallback } from 'react';
-import { Image, ScrollView, StatusBar, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import { Carousel } from 'react-native-reanimated-carousel';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useUser } from '../components/providers/UserContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+ import React, { useCallback, useState } from 'react';
+ import {
+   Alert,
+   Image,
+   Platform,
+   Pressable,
+   ScrollView,
+   StatusBar,
+   StyleSheet,
+   Text,
+   View,
+   useWindowDimensions,
+ } from 'react-native';
+ import { Carousel } from 'react-native-reanimated-carousel';
+ import { SafeAreaView } from 'react-native-safe-area-context';
+ import AsyncStorage from '@react-native-async-storage/async-storage';
+ import { useFocusEffect } from '@react-navigation/native';
+ import * as Notifications from 'expo-notifications';
+ import { useUser } from '../components/providers/UserContext';
+ import { useTranslation } from '../components/providers/LanguageContext';
 
+ Notifications.setNotificationHandler({
+   handleNotification: async () => ({
+     shouldShowAlert: true,
+     shouldPlaySound: true,
+     shouldSetBadge: false,
+     shouldShowBanner: true,
+     shouldShowList: true,
+   }),
+ });
 
+ const slides = [
+   { id: 'flower1', title: 'Daisy', image: require('../assets/flower1.png') },
+   { id: 'flower2', title: 'Hibiscus', image: require('../assets/flower2.png') },
+   { id: 'flower3', title: 'Sunflower', image: require('../assets/flower3.png') },
+   { id: 'flower4', title: 'Tulip', image: require('../assets/flower4.png') },
+ ];
 
-const slides = [
-	{
-		id: 'flower1',
-		title: 'Daisy',
-		image: require('../assets/flower1.png'),
-	},
-	{
-		id: 'flower2',
-		title: 'Hibiscus',
-		image: require('../assets/flower2.png'),
-	},
-	{
-		id: 'flower3',
-		title: 'Sunflower',
-		image: require('../assets/flower3.png'),
-	},
-	{
-		id: 'flower4',
-		title: 'Tulip',
-		image: require('../assets/flower4.png'),
-	},
-];
+ export default function ProfileScreen() {
+   const [currentSlide, setCurrentSlide] = useState(0);
+   const { width } = useWindowDimensions();
+   const carouselWidth = Math.max(width - 40, 0);
+   const [storedIdentity, setStoredIdentity] = useState('');
+   const [storedPassword, setStoredPassword] = useState('');
+   const { nin } = useUser();
+   const { t } = useTranslation();
 
-export default function ProfileScreen() {
-	const [currentSlide, setCurrentSlide] = useState(0);
-	const { width } = useWindowDimensions();
-	const carouselWidth = Math.max(width - 40, 0);
-	const [storedIdentity, setStoredIdentity] = useState('');
-	const [storedPassword, setStoredPassword] = useState('');
-const { nin } = useUser();
+   const text = {
+     title: t('flowersTitle'),
+     storedId: t('ninLabel') || 'ID',
+     storedPass: t('password') || 'Password',
+     welcome: 'Welcome!',
+     welcomeBody: 'Good to see you.',
+   };
 
-useFocusEffect(
-		useCallback(() => {
-			const loadCredentials = async () => {
-				try {
-					const savedId = await AsyncStorage.getItem('saved_identity');
-					const savedPass = await AsyncStorage.getItem('saved_password');
-					
-					if (savedId !== null) setStoredIdentity(savedId);
-					if (savedPass !== null) setStoredPassword(savedPass);
-				} catch (error) {
-					console.error('Error loading credentials', error);
-				}
-			};
+   useFocusEffect(
+     useCallback(() => {
+       const loadCredentials = async () => {
+         try {
+           const savedId = await AsyncStorage.getItem('saved_identity');
+           const savedPass = await AsyncStorage.getItem('saved_password');
 
-			loadCredentials();
-		}, [])
-	);
+           if (savedId !== null) setStoredIdentity(savedId);
+           if (savedPass !== null) setStoredPassword(savedPass);
+         } catch (error) {
+           console.error('Error loading credentials', error);
+         }
+       };
 
-	return (
-		<SafeAreaView style={styles.safeArea}>
-			<StatusBar barStyle="light-content" backgroundColor="#09156e" />
-			<ScrollView contentContainerStyle={styles.content}>
-				<View style={styles.heading}>
-					
-                 {/*  Identity  */}
-        <Text style={styles.eyebrow}>
-            STORED ID: {storedIdentity ? storedIdentity : 'None'}
-        </Text>
-        
-        {/*   Password  */}
-        <Text style={styles.eyebrow}>
-            STORED PASS: {storedPassword ? storedPassword : 'None'}
-        </Text>
+       loadCredentials();
+     }, [])
+   );
 
-        <Text style={styles.title}>FLOWERS</Text>
-    </View>
+   const handleWelcomeNotification = async () => {
+     if (Platform.OS !== 'ios') return;
 
-    <View style={styles.carouselFrame}>
+       try {
+         await Notifications.scheduleNotificationAsync({
+           content: {
+             title: text.welcome,
+             body: text.welcomeBody,
+             sound: true,
+           },
+           trigger: 
+             null,
+           
+         });
+       } catch (error) {
+         console.error('Error scheduling notification', error);
+         Alert.alert('Notification error', 'The notification could not be scheduled.');
+       }
+   };
 
+   return (
+     <SafeAreaView style={styles.safeArea}>
+       <StatusBar barStyle="light-content" backgroundColor="#09156e" />
+       <ScrollView contentContainerStyle={styles.content}>
+         <View style={styles.heading}>
+           <Text style={styles.eyebrow}>
+             {text.storedId}: {storedIdentity || nin || 'None'}
+           </Text>
+           <Text style={styles.eyebrow}>
+             {text.storedPass}: {storedPassword || 'None'}
+           </Text>
+           <Text style={styles.title}>{text.title}</Text>
+         </View>
 
-					<Text style={styles.title}>FLOWERS</Text>
-				</View>
+         {Platform.OS === 'ios' && (
+           <Pressable
+             accessibilityRole="button"
+             onPress={handleWelcomeNotification}
+             style={styles.notificationsBtn}
+           >
+             <Text style={styles.btnText}>Notify me</Text>
+           </Pressable>
+         )}
 
-				<View style={styles.carouselFrame}>
-					<Carousel
-						data={slides}
-						style={{ width: carouselWidth, height: 380 }}
-						layout={{ type: 'parallax', offset: 70, scale: 0.85, adjacentScale: 0.67 }}
-						loop
-						autoplay 
-						autoplayInterval={3000}
-						animation={{ type: 'timing', duration: 650 }}
-						keyExtractor={(item) => item.id}
-						onSnapToItem={setCurrentSlide}
-						renderItem={({ item }) => (
-							<View style={styles.slide}>
-								<View style={styles.imageContainer}>
-									<Image
-										source={item.image}
-										style={styles.image}
-										blurRadius={item.id === slides[currentSlide].id ? 0 : 5}
-									/>
-									<View style={styles.imageCaption}>
-										<Text style={styles.imageTitle}>{item.title}</Text>
-									</View>
-								</View>
-							</View>
-						)}
-					/>
-				</View>
-			</ScrollView>
-		</SafeAreaView>
-	);
-}
+         <View style={styles.carouselFrame}>
+           <Carousel
+             data={slides}
+             style={{ width: carouselWidth, height: 380 }}
+             layout={{ type: 'parallax', offset: 70, scale: 0.85, adjacentScale: 0.67 }}
+             loop
+             autoplay
+             autoplayInterval={3000}
+             animation={{ type: 'timing', duration: 650 }}
+             keyExtractor={(item) => item.id}
+             onSnapToItem={setCurrentSlide}
+             renderItem={({ item }) => (
+               <View style={styles.slide}>
+                 <View style={styles.imageContainer}>
+                   <Image
+                     source={item.image}
+                     style={styles.image}
+                     blurRadius={item.id === slides[currentSlide].id ? 0 : 5}
+                   />
+                   <View style={styles.imageCaption}>
+                     <Text style={styles.imageTitle}>{item.title}</Text>
+                   </View>
+                 </View>
+               </View>
+             )}
+           />
+         </View>
+       </ScrollView>
+     </SafeAreaView>
+   );
+ }
 
-const styles = StyleSheet.create({
-	safeArea: {
-		flex: 1,
-		backgroundColor: '#0f143a',
-	},
-	content: {
-		flexGrow: 1,
-		alignItems: 'center',
-		paddingHorizontal: 20,
-		paddingTop: 24,
-		paddingBottom: 32,
-	},
-	heading: {
-		width: '100%',
-		maxWidth: 520,
-		marginBottom: 22,
-	},
-	eyebrow: {
-		color: '#bd8aff',
-		fontSize: 12,
-		fontWeight: '800',
-		letterSpacing: 2,
-		marginBottom: 8,
-	},
-	title: {
-		color: '#fff',
-		fontSize: 28,
-		fontWeight: '800',
-	},
-	carouselFrame: {
-		width: '100%',
-		alignItems: 'center',
-		overflow: 'hidden',
-		borderRadius: 24,
-	},
-	slide: {
-		flex: 1,
-		paddingHorizontal: 2,
-		paddingVertical: 2,
-	},
-	imageContainer: {
-		flex: 1,
-		overflow: 'hidden',
-		borderRadius: 22,
-		backgroundColor: '#202957',
-	},
-	image: {
-		width: '100%',
-		height: '100%',
-	},
-	imageCaption: {
-		position: 'absolute',
-		right: 0,
-		bottom: 0,
-		left: 0,
-		paddingHorizontal: 18,
-		paddingVertical: 18,
-		backgroundColor: 'rgba(177, 182, 212, 0.7)',
-	},
-	imageTitle: {
-		color: '#fff',
-		fontSize: 18,
-		fontWeight: '700',
-	},
-});
+ const styles = StyleSheet.create({
+   safeArea: {
+     flex: 1,
+     backgroundColor: '#0f143a',
+   },
+   content: {
+     flexGrow: 1,
+     alignItems: 'center',
+     paddingHorizontal: 20,
+     paddingTop: 24,
+     paddingBottom: 32,
+   },
+   heading: {
+     width: '100%',
+     maxWidth: 520,
+     marginBottom: 22,
+   },
+   eyebrow: {
+     color: '#bd8aff',
+     fontSize: 12,
+     fontWeight: '800',
+     letterSpacing: 2,
+     marginBottom: 8,
+   },
+   title: {
+     color: '#fff',
+     fontSize: 28,
+     fontWeight: '800',
+   },
+   notificationsBtn: {
+     backgroundColor: '#8b3dff',
+     paddingVertical: 14,
+     paddingHorizontal: 24,
+     borderRadius: 12,
+     marginBottom: 24,
+     width: '100%',
+     maxWidth: 520,
+     alignItems: 'center',
+   },
+   btnText: {
+     color: '#ffffff',
+     fontSize: 16,
+     fontWeight: '700',
+   },
+   carouselFrame: {
+     width: '100%',
+     alignItems: 'center',
+     overflow: 'hidden',
+     borderRadius: 24,
+   },
+   slide: {
+     flex: 1,
+     paddingHorizontal: 2,
+     paddingVertical: 2,
+   },
+   imageContainer: {
+     flex: 1,
+     overflow: 'hidden',
+     borderRadius: 22,
+     backgroundColor: '#202957',
+   },
+   image: {
+     width: '100%',
+     height: '100%',
+   },
+   imageCaption: {
+     position: 'absolute',
+     right: 0,
+     bottom: 0,
+     left: 0,
+     paddingHorizontal: 18,
+     paddingVertical: 18,
+     backgroundColor: 'rgba(177, 182, 212, 0.7)',
+   },
+   imageTitle: {
+     color: '#fff',
+     fontSize: 18,
+     fontWeight: '700',
+   },
+ });

@@ -18,7 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '../components/providers/UserContext';
 import { useTranslation } from '../components/providers/LanguageContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import * as LocalAuthentication from 'expo-local-authentication';
 
 function BackgroundPattern() {
   return (
@@ -105,6 +105,29 @@ export default function LoginScreen({ navigation }) {
     createAccount: t('createAccountPrompt'),
     register: t('register'),
     copyright: t('copyright') || '© Edaa Connect',
+  };
+
+  const handleBiometricLogin = async () => {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+    if (!hasHardware || !isEnrolled) {
+      Alert.alert(
+        text.title,
+        language === 'en'
+          ? 'Biometrics not available on this device.'
+          : 'البصمة غير متوفرة على هذا الجهاز.'
+      );
+      return;
+    }
+
+    const auth = await LocalAuthentication.authenticateAsync({
+      promptMessage: language === 'en' ? 'Sign in to your account' : 'تسجيل الدخول إلى حسابك',
+    });
+
+    if (auth.success) {
+        navigation.navigate('Home');
+    }
   };
 
   const handleLogin = async () => {
@@ -246,12 +269,14 @@ export default function LoginScreen({ navigation }) {
             </View>
 
             {/* Biometric Button */}
-            <Pressable onPress={() => Alert.alert(text.biometric)} style={{ alignSelf: 'center', alignItems: 'center', marginTop: 10 }}>
+            <Pressable onPress={handleBiometricLogin} style={{ alignSelf: 'center', alignItems: 'center', marginTop: 10 }}>
               <View style={{ width: 75, height: 60, borderWidth: 1, borderColor: '#f8fafc', borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons name="finger-print-outline" size={32} color="#f8fafc" />
               </View>
               <Text style={{ color: '#fff', fontSize: 15, marginTop: 10 }}>{text.biometric}</Text>
             </Pressable>
+
+            
 
             {/* Register Link */}
             <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'center', marginTop: 45 }}>
@@ -271,4 +296,3 @@ export default function LoginScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
