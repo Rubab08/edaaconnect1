@@ -1,3 +1,0 @@
-export const GET_USERS = '/get-users';
-export const SAVE_USER = '/users';
-export const SAVE_DEPARTMENT = '/department';

@@ -1,109 +1,143 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
-import axios from 'axios';
-import API_URL from '../components/mainURL';
-import { GET_USERS , SAVE_USER  } from '../components/EndPoints';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert, ScrollView } from 'react-native';
+import { getRequest } from '../components/mainURL.js';
+import { postRequest } from '../components/mainURL.js';
+import { GET_USERS, SAVE_USER, GET_DEPARTMENT, SAVE_DEPARTMENT } from '../components/EndPoints.js';
 
 export default function TestScreen() {
-  const [users, setUsers] = useState([]);
-  const [departments, setDepartments] = useState([]);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [departmentName, setdepartmentName] = useState('');
 
-  const loadAllData = async () => {
+ 
+  const [users, setUsers] = useState([]);
+  const [department, setDepartment] = useState([]);
+
+  // GET for user and department
+  const loadScreenData = async () => {
     try {
-      // 1. Fetch Users using the standardized method
       const usersData = await getRequest(GET_USERS);
       setUsers(usersData);
 
-      // 2. Fetch Departments using the exact same method
-      const deptData = await getRequest(GET_DEPARTMENTS);
-      setDepartments(deptData);
+      const deptData = await getRequest(GET_DEPARTMENT);
+      setDepartment(deptData);
     } catch (error) {
-      console.error('Failed to load screen data', error);
+      console.error('Error fetching screen data:', error);
     }
   };
 
-  
   useEffect(() => {
-    fetchUsers();
+    loadScreenData();
   }, []);
 
-  // Save new user 
-  const handleSave = async () => {
+  //  POST for User
+  const handleSaveUser = async () => {
     if (!name || !email) {
       Alert.alert('Error', 'Please enter both Name and Email');
       return;
     }
-
     try {
-      const response = await axios.post(`${API_URL}${SAVE_USER}`, {
-        name: name,
-        email: email,
-      });
-
-    
+      const response = await postRequest(SAVE_USER, { name, email });
       if (response.status === 201 || response.status === 200) {
-        Alert.alert('Success', 'Data saved to MS SQL');
+        Alert.alert('Success', 'User saved to database!');
         setName('');
         setEmail('');
-        fetchUsers(); 
+        loadScreenData(); // Refresh lists
       }
     } catch (error) {
-      Alert.alert('Error', 'Could not connect to backend');
-      console.error('Axios error:', error);
+      Alert.alert('Error', 'Could not save user');
+    }
+  };
+
+  // POST for Department
+  const handleSaveDepartment = async () => {
+    if (!departmentName) {
+      Alert.alert('Error', 'Please enter Department Name');
+      return;
+    }
+    try {
+      const response = await postRequest(SAVE_DEPARTMENT, { departmentName });
+      if (response.status === 201 || response.status === 200) {
+        Alert.alert('Success', 'Department saved to database!');
+        setdepartmentName('');
+        loadScreenData(); // Refresh
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Could not save department');
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Enter Details</Text>
+    <ScrollView style={styles.container}>
       
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-      />
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-      
-      <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>Save to Database</Text>
+      {/* 1. USER ENTRY  */}
+      <View style={styles.formSection}>
+        <Text style={styles.header}>Add New User</Text>
+        <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
+        <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
+        <TouchableOpacity style={styles.button} onPress={handleSaveUser}>
+          <Text style={styles.buttonText}>Save User</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 2. DEPARTMENT ENTRY */}
+      <View style={styles.formSection}>
+        <Text style={styles.header}>Add New Department</Text>
+        <TextInput style={styles.input} placeholder="Department Name (e.g., IT)" value={departmentName} onChangeText={setdepartmentName} />
+        <TouchableOpacity style={styles.button} onPress={handleSaveDepartment}>
+          <Text style={styles.buttonText}>Save Department</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 3. REFRESH BUTTON FOR BOTH */}
+      <TouchableOpacity style={styles.refreshButton} onPress={loadScreenData}>
+        <Text style={styles.buttonText}>Refresh All Data</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.refreshButton} onPress={fetchUsers}>
-        <Text style={styles.buttonText}>Refresh Data</Text>
-      </TouchableOpacity>
-
+      {/* 4. USERS LIST */}
       <Text style={styles.subHeader}>Saved Users:</Text>
       <FlatList
+        scrollEnabled={false} 
         data={users}
-        keyExtractor={(item) => item.Id.toString()}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <View style={styles.userCard}>
-            <Text style={styles.userText}>Name: {item.Name}</Text>
-            <Text style={styles.userText}>Email: {item.Email}</Text>
+          <View style={styles.card}>
+            <Text style={styles.text}>Name: {item.Name}</Text>
+            <Text style={styles.text}>Email: {item.Email}</Text>
           </View>
         )}
-        ListEmptyComponent={<Text>No data found in database.</Text>}
+        ListEmptyComponent={<Text style={styles.emptyText}>No users found.</Text>}
       />
-    </View>
+
+      {/* 5. DEPARTMENTS LIST */}
+      <Text style={styles.subHeader}>Saved Department:</Text>
+      <FlatList
+        scrollEnabled={false}
+        data={department}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Text style={styles.text}>Name: {item.departmentName}</Text>
+          </View>
+        )}
+        ListEmptyComponent={<Text style={styles.emptyText}>No department found.</Text>}
+      />
+      
+      <View style={{ height: 60 }} /> 
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#20205f', marginTop: 40 },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: 'white' },
-  subHeader: { fontSize: 18, fontWeight: 'bold', marginTop: 30, marginBottom: 10, color: 'white' },
-  input: { backgroundColor: 'white', padding: 15, borderRadius: 8, marginBottom: 15, borderWidth: 1, borderColor: '#ddd' },
-  button: { backgroundColor: '#bd8aff', padding: 15, borderRadius: 8, alignItems: 'center' },
-  refreshButton: { backgroundColor: '#bd8aff', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 10 },
+  formSection: { marginBottom: 30, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: '#3a3a8a' },
+  header: { fontSize: 22, fontWeight: 'bold', marginBottom: 15, color: 'white' },
+  subHeader: { fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10, color: 'white' },
+  input: { backgroundColor: 'white', padding: 15, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: '#ddd' },
+  button: { backgroundColor: '#bd8aff', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 5 },
+  refreshButton: { backgroundColor: '#3a3a8a', padding: 15, borderRadius: 8, alignItems: 'center', marginVertical: 10 },
   buttonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
-  userCard: { backgroundColor: 'white', padding: 15, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: '#eee' },
-  userText: { fontSize: 16 }
+  card: { backgroundColor: 'white', padding: 15, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: '#eee' },
+  text: { fontSize: 16 },
+  emptyText: { color: '#bd8aff', fontStyle: 'italic' }
 });
