@@ -15,11 +15,12 @@
  import { SafeAreaView } from 'react-native-safe-area-context';
  import AsyncStorage from '@react-native-async-storage/async-storage';
  import { useFocusEffect } from '@react-navigation/native';
- //import * as Notifications from 'expo-notifications';
+ import axios from 'axios';
+ import * as Notifications from 'expo-notifications';
  import { useUser } from '../components/providers/UserContext';
  import { useTranslation } from '../components/providers/LanguageContext';
 
-  /*Notifications.setNotificationHandler({
+  Notifications.setNotificationHandler({
     handleNotification: async () => ({
      shouldShowAlert: true,
      shouldPlaySound: true,
@@ -27,7 +28,7 @@
      shouldShowBanner: true,
      shouldShowList: true,
    }),
- });*/
+ });
 
  const slides = [
    { id: 'flower1', title: 'Daisy', image: require('../assets/flower1.png') },
@@ -42,6 +43,7 @@
    const carouselWidth = Math.max(width - 40, 0);
    const [storedIdentity, setStoredIdentity] = useState('');
    const [storedPassword, setStoredPassword] = useState('');
+   const [apiResponse, setApiResponse] = useState('');
    const { nin } = useUser();
    const { t } = useTranslation();
 
@@ -70,8 +72,33 @@
        loadCredentials();
      }, [])
    );
+      
+   const handleGetdata = async () => {
+      try {
+        const response = await axios.get('https://jsonplaceholder.typicode.com/posts/1')
+    
+    setApiResponse(JSON.stringify(response.data));
+  } catch (error) {
+    console.error('Error retrieving data', error);
+    Alert.alert('Error','Failed to retrieve data');
+  }
+};
 
-  /*const handleWelcomeNotification = async () => {
+    const handlePostData = async () => {
+      try {
+        const response = await axios.post('https://jsonplaceholder.typicode.com/posts', {
+          title: 'user',
+          body: 'posting data',
+          userId:1,
+        });
+        setApiResponse(JSON.stringify(response.data));
+      } catch (error) {
+        console.error('Error posting data', error);
+        Alert.alert('Error', 'Failed to post data.');
+      }
+    };
+
+  const handleWelcomeNotification = async () => {
      if (Platform.OS !== 'ios') return;
 
        try {
@@ -90,7 +117,7 @@
          Alert.alert('Notification error', 'The notification could not be scheduled.');
        }
    };
-*/
+
    return (
      <SafeAreaView style={styles.safeArea}>
        <StatusBar barStyle="light-content" backgroundColor="#09156e" />
@@ -105,6 +132,23 @@
            <Text style={styles.title}>{text.title}</Text>
          </View>
 
+
+         <View style={styles.apiButtonsContainer}>
+           <Pressable style={styles.actionBtn} onPress={handleGetdata}>
+             <Text style={styles.btnText}>Get Data</Text>
+            </Pressable>
+            <Pressable styles={styles.actionBtn} onPress={handlePostData}>
+             <Text style={styles.btnText}>Post Data</Text>
+           </Pressable>
+         </View>
+         {apiResponse !==''&&(
+        <View style={styles.responseContainer}>
+          <Text style={styles.responseText}>{apiResponse}</Text>
+        </View>
+         ) 
+        }
+                
+
          {Platform.OS === 'ios' && (
            <Pressable
              accessibilityRole="button"
@@ -118,7 +162,7 @@
          <View style={styles.carouselFrame}>
            <Carousel
              data={slides}
-             style={{ width: carouselWidth, height: 380 }}
+             style={{ width: carouselWidth, height: 300 }}
              layout={{ type: 'parallax', offset: 70, scale: 0.85, adjacentScale: 0.67 }}
              loop
              autoplay
@@ -176,7 +220,36 @@
      fontSize: 28,
      fontWeight: '800',
    },
-  /* notificationsBtn: {
+
+apiButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    maxWidth: 520,
+    marginBottom: 20,
+  },
+  actionBtn: {
+    backgroundColor: '#bd8aff',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    flex: 0.48,
+    alignItems: 'center',
+  },
+  responseContainer: {
+    width: '100%',
+    maxWidth: 520,
+    backgroundColor: '#202957',
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 24,
+  },
+  responseText: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+  },
+   notificationsBtn: {
      backgroundColor: '#8b3dff',
      paddingVertical: 14,
      paddingHorizontal: 24,
@@ -190,7 +263,7 @@
      color: '#ffffff',
      fontSize: 16,
      fontWeight: '700',
-   },*/
+   },
    carouselFrame: {
      width: '100%',
      alignItems: 'center',

@@ -12,6 +12,8 @@ import RegisterScreen from '../../app/register';
 import HomeScreen from '../../app/home';
 import ProfileScreen from '../../app/profile';
 import SettingsScreen from '../../app/settings';
+import TestScreen from '../../app/TestScreen';
+import DepartmentScreen from '../../app/department';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -20,6 +22,8 @@ const Tabs = createBottomTabNavigator();
 function CustomDrawerContent(props) {
   const drawerItems = [
     { label: 'Home', target: 'HomeMain' },
+    { label: 'Test Screen', target: 'TestScreen' },
+    { label: 'Department', target: 'Department' },
     { label: 'Login', target: 'Login' },
     { label: 'Register', target: 'Register' },
   ];
@@ -59,6 +63,8 @@ function HomeDrawer() {
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen name="HomeMain" component={HomeTabs} />
+      <Drawer.Screen name="TestScreen" component={TestScreen} />
+      <Drawer.Screen name="Department" component={DepartmentScreen} />
     </Drawer.Navigator>
   );
 }
