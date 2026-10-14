@@ -17,6 +17,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from '../components/providers/LanguageContext';
+import { postRequest } from '../components/mainURL.js';
+import { SAVE_USER } from '../components/EndPoints.js';
+
 
 
 const fieldErrorMessages = {
@@ -41,7 +44,6 @@ const glowColumns = [
 	{ left: '85%', height: '19%', width: 20 },
 	{ left: '95%', height: '23%', width: 15 },
 ];
-
 function BackgroundPattern() {
 	return (
 		<View pointerEvents="none" style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}>
@@ -89,7 +91,6 @@ export default function RegisterScreen({ navigation }) {
 	const [errors, setErrors] = useState({});
 	const [datePickerVisible, setDatePickerVisible] = useState(false);
 	const [datePickerValue, setDatePickerValue] = useState(new Date(currentYear - 25, 0, 1));
-	
 
 	function updateForm(field, value) {
 		if (field !== 'email' && !/^\d*$/.test(value)) return;
@@ -119,23 +120,54 @@ export default function RegisterScreen({ navigation }) {
 		});
 	}
 
-	function submitRegistration() {
-		const nextErrors = {
-			email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email),
-			mobile: !/^\d{11,}$/.test(form.mobile),
-			identity: !/^\d{10,}$/.test(form.identity),
-			year: !form.year,
-			month: !form.month,
-			day: !form.day,
-			terms: !acceptedTerms,
-		};
-		setErrors(nextErrors);
-		const invalidFields = Object.keys(nextErrors).filter((field) => nextErrors[field]);
-		if (invalidFields.length > 0) {
-			return;
-		}
-		Alert.alert(text.title, language === 'en' ? 'Your registration details are ready.' : 'بيانات التسجيل جاهزة.');
-	}
+  
+	async function submitRegistration() {
+    // 1. Check for errors
+    const nextErrors = {
+        email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email),
+        mobile: !/^\d{11,}$/.test(form.mobile),
+        identity: !/^\d{10,}$/.test(form.identity),
+        year: !form.year,
+        month: !form.month,
+        day: !form.day,
+        terms: !acceptedTerms,
+    };
+    setErrors(nextErrors);
+    
+    const invalidFields = Object.keys(nextErrors).filter((field) => nextErrors[field]);
+    if (invalidFields.length > 0) {
+        Alert.alert('Error', language === 'en' ? 'Please fill all required fields.' : 'يرجى تعبئة جميع الحقول المطلوبة.');
+        return;
+    }
+
+    
+    const formattedDate = `${form.year}-${form.month}-${form.day}`;
+
+    
+    const payload = {
+        email: form.email,
+        mobile: form.mobile,
+        identity: form.identity,
+        gender: gender,
+        birthDate: formattedDate
+    };
+
+    
+    try {
+        
+        const response = await postRequest(SAVE_USER, payload); 
+        
+        if (response && (response.status === 201 || response.status === 200)) {
+            Alert.alert(text.title, language === 'en' ? 'Registration successful!' : 'تم التسجيل بنجاح!');
+            
+            
+            navigation.navigate('Login');
+        }
+    } catch (error) {
+        Alert.alert('Registration Failed', 'Could not save user to the database.');
+        console.error('Registration submission error:', error);
+    }
+}
 
 	function openDatePicker() {
 		const currentDate = form.year && form.month && form.day
