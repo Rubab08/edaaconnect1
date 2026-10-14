@@ -13,12 +13,15 @@ import {
   Image,
   View,
 } from 'react-native';
+import { postRequest } from '../components/mainURL.js';
+import { LOGIN_USER } from '../components/EndPoints.js';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '../components/providers/UserContext';
 import { useTranslation } from '../components/providers/LanguageContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
+import { useLoading } from '../components/providers/LoadingContext';
 
 function BackgroundPattern() {
   return (
@@ -177,27 +180,40 @@ export default function LoginScreen({ navigation }) {
       Alert.alert(text.title, text.biometricFailed);
     }
   };
-
+const {setIsLoading} = useLoading();
   const handleLogin = async () => {
-    if (!identity.trim() || !password) {
-      Alert.alert(text.title, text.errMissing);
-      return;
-    }
+  
+  if (!identity.trim() || !password) {
+    Alert.alert(text.title, 'Please enter both Identity and Password');
+    return;
+  }
+ setIsLoading(true);
+  try {
+    
+    const response = await postRequest(LOGIN_USER, {
+      identity: identity.trim(),
+      password: password
+    });
 
-    try {
-      await AsyncStorage.setItem('saved_identity', identity.trim());
-      await AsyncStorage.setItem('saved_password', password);
+    if (response && response.status === 200) {
+      
+      
+      setNin(identity.trim());
+
+      
+        navigation.navigate('Home'); 
+        
+        }
     } catch (error) {
-      console.error('Error saving data', error);
+      setIsLoading(false);
+      
+      if (error.response && error.response.status === 401) {
+        Alert.alert('Login Failed', 'User does not match our records.'); 
+      } else {
+        Alert.alert('Error', 'Server error or connection failed');
+        console.error('Login request error:', error);
+      }
     }
-
-    setNin(identity.trim());
-    Alert.alert(t('loginTitle'), t('successMsg'), [
-      {
-        text: 'OK',
-        onPress: () => navigation.navigate('Home'),
-      },
-    ]);
   };
 
   return (

@@ -2,8 +2,18 @@ import React from 'react';
 import { Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import react, { useEffect } from 'react';
+import { useLoading } from '../components/providers/LoadingContext';
 
 export default function HomeScreen({ navigation }) {
+
+  const { setIsLoading } = useLoading();
+
+  useEffect(() => {
+   
+    setIsLoading(false);
+  }, []); 
+  
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#0f143a" />

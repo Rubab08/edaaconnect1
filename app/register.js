@@ -26,6 +26,7 @@ const fieldErrorMessages = {
 	email: 'Please Enter Valid Email',
 	mobile: 'Please Enter Valid Phone Numbers',
 	identity: 'National ID/ IQAMA Required',
+	password: 'Password is required',
 };
 
 const currentYear = new Date().getFullYear();
@@ -33,8 +34,9 @@ const formFields = [
 	{ key: 'email', placeholder: 'email@domain.com', keyboardType: 'email-address' },
 	{ key: 'mobile', placeholder: '9665xxxxxx', keyboardType: 'phone-pad' },
 	{ key: 'identity', placeholder: 'National ID / IQAMA', keyboardType: 'alphanumeric' },
+	{ key: 'password', placeholder: 'Enter Password', keyboardType: 'default' },
 ];
-const emptyForm = { email: '', mobile: '', identity: '', year: '', month: '', day: '' };
+const emptyForm = { email: '', mobile: '', identity: '', password: '', year: '', month: '', day: '' };
 const glowColumns = [
 	{ left: '5%', height: '18%', width: 25 },
 	{ left: '15%', height: '12%', width: 20 },
@@ -73,6 +75,8 @@ export default function RegisterScreen({ navigation }) {
 		email: t('email'),
 		mobile: t('mobile'),
 		identity: t('identity'),
+		password: t('password'),
+		passwordPlaceholder: t('passwordPlaceholder'),
 		gender: t('gender'),
 		selectGender: t('selectGender'),
 		female: t('female'),
@@ -93,7 +97,7 @@ export default function RegisterScreen({ navigation }) {
 	const [datePickerValue, setDatePickerValue] = useState(new Date(currentYear - 25, 0, 1));
 
 	function updateForm(field, value) {
-		if (field !== 'email' && !/^\d*$/.test(value)) return;
+		if ((field === 'mobile' || field === 'identity') && !/^\d*$/.test(value)) return;
 		setForm((current) => ({ ...current, [field]: value }));
 		setErrors((current) => ({ ...current, [field]: field === 'mobile' ? value.length < 11 : false }));
 	}
@@ -108,7 +112,7 @@ export default function RegisterScreen({ navigation }) {
 			title: text.cancelTitle,
 		}, (selectedIndex) => {
 			if (selectedIndex === 1) {
-				setForm((current) => ({ ...current, email: '', mobile: '', identity: '' }));
+				setForm((current) => ({ ...current, email: '', mobile: '', identity: '', password: '' }));
 			}
 
 			if (selectedIndex === 2) {
@@ -127,6 +131,7 @@ export default function RegisterScreen({ navigation }) {
         email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email),
         mobile: !/^\d{11,}$/.test(form.mobile),
         identity: !/^\d{10,}$/.test(form.identity),
+        password: !form.password,
         year: !form.year,
         month: !form.month,
         day: !form.day,
@@ -148,6 +153,7 @@ export default function RegisterScreen({ navigation }) {
         email: form.email,
         mobile: form.mobile,
         identity: form.identity,
+        password: form.password,
         gender: gender,
         birthDate: formattedDate
     };
@@ -218,6 +224,7 @@ export default function RegisterScreen({ navigation }) {
 					keyboardType={keyboardType}
 					autoCapitalize="none"
 					autoCorrect={false}
+					secureTextEntry={field === 'password'}
 					style={[{ height: 35, borderRadius: 8, backgroundColor: '#001d31', paddingHorizontal: 12, color: '#fff', fontSize: 11 }, language === 'ar' && { textAlign: 'right' }]}
 				/>
 				{errors[field] && <Text style={{ color: '#ff6676', fontSize: 12, marginTop: 4 }}>{fieldErrorMessages[field]}</Text>}
@@ -256,7 +263,12 @@ export default function RegisterScreen({ navigation }) {
 					</View>
 
 					<View style={{ marginTop: 60 }}>
-						{formFields.map((field) => renderField(text[field.key], field.key, field.placeholder, field.keyboardType))}
+						{formFields.map((field) => renderField(
+							text[field.key],
+							field.key,
+							field.key === 'password' ? text.passwordPlaceholder : field.placeholder,
+							field.keyboardType
+						))}
 
 						<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginBottom: 6 }}>{text.gender}</Text>
 						<Dropdown
