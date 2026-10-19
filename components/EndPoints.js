@@ -4,3 +4,4 @@ export const SAVE_DEPARTMENT = '/department';
 export const GET_DEPARTMENT = '/get-department';
 export const LOGIN_USER = '/login';
 export const GET_PORTFOLIO_STATS = '/portfolio-stats';
+export const GET_DEMO = '/get-demo';
