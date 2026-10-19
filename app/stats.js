@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { VictoryPie } from 'victory-native';
+import { VictoryPie, LineSegment} from 'victory-native';
 import { getRequest } from '../components/mainURL.js';
 import { GET_PORTFOLIO_STATS } from '../components/EndPoints.js';
 
@@ -115,18 +115,33 @@ const App = () => {
                  data={chartData}
                  animate={{ duration: 500 }}
                  colorScale={["#D8B4FF", "#8A2BE2"]}
-                 labels={({ datum }) => `${datum.y}%`}
-                 labelRadius={({ innerRadius }) => innerRadius + 60 }
+                 labels={({ datum }) => `${datum.x}, ${datum.y}%`}
+                 
+                 
+                 labelIndicator={
+                   <LineSegment style={{ stroke: 'white', strokeWidth: 1, opacity: 0.5 }} />
+                 }
+                 labelIndicatorInnerOffset={10}
+                 labelIndicatorOuterOffset={10}
+                 
+                 labelPosition="centroid"
+                 labelPlacement="vertical"
+                 
+                 
+                 labelRadius={({ innerRadius }) => innerRadius + 120 }
+                 
+                
+                 padding={{ top: 70, bottom: 70, left: 100, right: 100 }}
+                 
                  style={{
                    labels: { 
-                     fill : ({ datum }) => datum.x === 'Cash' ? 'black' : 'white', 
-                     fontSize: 16, 
+                     fill: 'white', 
+                     fontSize: 13, 
                      fontWeight: "bold" 
                    }
                  }}
-                 width={350}
-                 height={300}
-                 padding={30}
+                 width={400}
+                 height={400}
                />
              ) : (
               //hidden chart
