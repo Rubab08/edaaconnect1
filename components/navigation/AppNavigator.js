@@ -13,6 +13,7 @@ import HomeScreen from '../../app/home';
 import ProfileScreen from '../../app/profile';
 import SettingsScreen from '../../app/settings';
 import TestScreen from '../../app/TestScreen';
+import StatsScreen from '../../app/stats';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -21,6 +22,7 @@ const Tabs = createBottomTabNavigator();
 function CustomDrawerContent(props) {
   const drawerItems = [
     { label: 'Home', target: 'HomeMain' },
+    { label: 'Portfolio', target: 'Stats' },
     { label: 'Test Screen', target: 'TestScreen' },
     { label: 'Login', target: 'Login' },
     { label: 'Register', target: 'Register' },
@@ -61,6 +63,7 @@ function HomeDrawer() {
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen name="HomeMain" component={HomeTabs} />
+      <Drawer.Screen name="Stats" component={StatsScreen} />
       <Drawer.Screen name="TestScreen" component={TestScreen} />
     </Drawer.Navigator>
   );
