@@ -16,11 +16,11 @@
  import AsyncStorage from '@react-native-async-storage/async-storage';
  import { useFocusEffect } from '@react-navigation/native';
  import axios from 'axios';
- import * as Notifications from 'expo-notifications';
+ //import * as Notifications from 'expo-notifications';
  import { useUser } from '../components/providers/UserContext';
  import { useTranslation } from '../components/providers/LanguageContext';
 
-  Notifications.setNotificationHandler({
+ /*Notifications.setNotificationHandler({
     handleNotification: async () => ({
      shouldShowAlert: true,
      shouldPlaySound: true,
@@ -28,7 +28,7 @@
      shouldShowBanner: true,
      shouldShowList: true,
    }),
- });
+ });*/
 
  const slides = [
    { id: 'flower1', title: 'Daisy', image: require('../assets/flower1.png') },
@@ -98,7 +98,7 @@
       }
     };
 
-  const handleWelcomeNotification = async () => {
+  /* const handleWelcomeNotification = async () => {
      if (Platform.OS !== 'ios') return;
 
        try {
@@ -116,7 +116,7 @@
          console.error('Error scheduling notification', error);
          Alert.alert('Notification error', 'The notification could not be scheduled.');
        }
-   };
+   }; */
 
    return (
      <SafeAreaView style={styles.safeArea}>
@@ -149,7 +149,7 @@
         }
                 
 
-         {Platform.OS === 'ios' && (
+         {/* {Platform.OS === 'ios' && (
            <Pressable
              accessibilityRole="button"
              onPress={handleWelcomeNotification}
@@ -157,7 +157,7 @@
            >
              <Text style={styles.btnText}>Notify me</Text>
            </Pressable>
-         )}
+         )} */}
 
          <View style={styles.carouselFrame}>
            <Carousel

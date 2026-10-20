@@ -10,6 +10,7 @@ import OnboardingScreen from '../../app/onboarding';
 import LoginScreen from '../../app/login';
 import RegisterScreen from '../../app/register';
 import HomeScreen from '../../app/home';
+import ChatScreen from '../../app/chat';
 import ProfileScreen from '../../app/profile';
 import SettingsScreen from '../../app/settings';
 import TestScreen from '../../app/TestScreen';
@@ -23,6 +24,7 @@ const Tabs = createBottomTabNavigator();
 function CustomDrawerContent(props) {
   const drawerItems = [
     { label: 'Home', target: 'HomeMain' },
+    { label: 'Chat', target: 'Chat' },
     { label: 'Portfolio', target: 'Stats' },
     { label: 'Demo', target: 'Demo' },
     { label: 'Test Screen', target: 'TestScreen' },
@@ -65,6 +67,7 @@ function HomeDrawer() {
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen name="HomeMain" component={HomeTabs} />
+      <Drawer.Screen name="Chat" component={ChatScreen} />
       <Drawer.Screen name="Stats" component={StatsScreen} />
       <Drawer.Screen name="Demo" component={DemoScreen} />
       <Drawer.Screen name="TestScreen" component={TestScreen} />
