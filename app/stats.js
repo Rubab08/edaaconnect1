@@ -6,7 +6,7 @@ import { VictoryPie, LineSegment} from 'victory-native';
 import { getRequest } from '../components/mainURL.js';
 import { GET_PORTFOLIO_STATS } from '../components/EndPoints.js';
 
-const App = () => {
+const App = ({ navigation }) => {
   const [chartData, setChartData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [chartError, setChartError] = useState(null);
@@ -37,24 +37,11 @@ const App = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#1A1B41' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#1A1B41' }}
+    edges={['right', 'left','bottom']}
+    >
       <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
         
-        {/* Header */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width: 1, height: 30, backgroundColor: '#4A4A6A', marginRight: 10 }} />
-
-            <Ionicons name="menu" size={24} color="white" />
-          
-          </View>
-          <Text style={{ color: 'white', fontSize: 17, fontWeight: '600' }}>Portfolio</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="search" size={24} color="white" style={{ marginRight: 14 }} />
-            <Ionicons name="notifications-outline" size={24} color="white" />
-          </View>
-        </View>
-
         {/* Total Balance Card */}
         <View style={{ backgroundColor: '#8A2BE2', marginHorizontal: 16, borderRadius: 20, padding: 20, marginTop: 10 }}>
           <Text style={{ color: 'white', fontSize: 36, fontWeight: 'bold' }}>

@@ -16,6 +16,7 @@ import SettingsScreen from '../../app/settings';
 import TestScreen from '../../app/TestScreen';
 import StatsScreen from '../../app/stats';
 import DemoScreen from '../../app/demo';
+import { Menu } from '@gluestack-ui/themed';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -67,8 +68,40 @@ function HomeDrawer() {
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen name="HomeMain" component={HomeTabs} />
-      <Drawer.Screen name="Chat" component={ChatScreen} />
-      <Drawer.Screen name="Stats" component={StatsScreen} />
+      <Drawer.Screen name="Chat" component={ChatScreen}
+        options={{
+          headerShown: true,
+          headerTitle: 'INBOX',
+          headerStyle: { backgroundColor: '#e2aeef' },
+          headerTintColor: '#1F2937'
+        }}
+
+      />
+      <Drawer.Screen 
+        name="Stats" 
+        component={StatsScreen}  
+        options={({ navigation }) => ({ 
+          headerShown: true,
+          headerTitle: 'PORTFOLIO',
+          headerStyle: { backgroundColor: '#1A1B41' },
+          headerTintColor: 'white',
+          headerLeft: () => (
+            <Ionicons
+              name="menu"
+              size={26}
+              color="white"
+              style={{ marginLeft: 5, marginRight: 20 }}
+              onPress={() => navigation.openDrawer()} // <-- This will now work!
+            />
+          ),
+          headerRight: () => (
+            <View style={{ flexDirection: 'row', marginRight: 15 }}>
+              <Ionicons name="search" size={24} color="white" style={{ marginRight: 14 }} />
+              <Ionicons name="notifications-outline" size={24} color="white" />
+            </View>
+          ),
+        })} 
+      />
       <Drawer.Screen name="Demo" component={DemoScreen} />
       <Drawer.Screen name="TestScreen" component={TestScreen} />
     </Drawer.Navigator>
@@ -113,11 +146,24 @@ function HomeTabs() {
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Onboarding" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Home" component={HomeDrawer} />
+      <Stack.Navigator initialRouteName="Onboarding" screenOptions={{ headerShown: true }}>
+        <Stack.Screen 
+          name="Onboarding" 
+          component={OnboardingScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen name="Login"  component={LoginScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen name="Register" component={RegisterScreen}
+        options={{headerShown: false}}
+        />
+        <Stack.Screen 
+          name="Home" 
+          component={HomeDrawer} 
+          options={{ headerShown: false }} 
+        />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

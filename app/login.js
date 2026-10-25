@@ -182,28 +182,26 @@ export default function LoginScreen({ navigation }) {
   };
 const {setIsLoading} = useLoading();
   const handleLogin = async () => {
-  
-  if (!identity.trim() || !password) {
-    Alert.alert(text.title, 'Please enter both Identity and Password');
-    return;
-  }
- setIsLoading(true);
-  try {
-    
-    const response = await postRequest(LOGIN_USER, {
-      identity: identity.trim(),
-      password: password
-    });
+    if (!identity.trim() || !password) {
+      Alert.alert(text.title, 'Please enter both Identity and Password');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const response = await postRequest(LOGIN_USER, {
+        identity: identity.trim(),
+        password: password
+      });
 
-    if (response && response.status === 200) {
-      
-      
-      setNin(identity.trim());
+      if (response && response.status === 200) {
+        setNin(identity.trim());
 
-      
+        // ADD THESE TWO LINES TO OVERWRITE OLD STORAGE
+        await AsyncStorage.setItem('saved_identity', identity.trim());
+        await AsyncStorage.setItem('saved_password', password);
+
         navigation.navigate('Home'); 
-        
-        }
+      }
     } catch (error) {
       setIsLoading(false);
       

@@ -19,6 +19,7 @@
  //import * as Notifications from 'expo-notifications';
  import { useUser } from '../components/providers/UserContext';
  import { useTranslation } from '../components/providers/LanguageContext';
+ import * as ImagePicker from 'expo-image-picker';
 
  /*Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -37,6 +38,7 @@
    { id: 'flower4', title: 'Tulip', image: require('../assets/flower4.png') },
  ];
 
+
  export default function ProfileScreen() {
    const [currentSlide, setCurrentSlide] = useState(0);
    const { width } = useWindowDimensions();
@@ -44,7 +46,8 @@
    const [storedIdentity, setStoredIdentity] = useState('');
    const [storedPassword, setStoredPassword] = useState('');
    const [apiResponse, setApiResponse] = useState('');
-   const { nin } = useUser();
+   const [profilePic, setProfilePic] = useState(null);
+   const { nin , password } = useUser();
    const { t } = useTranslation();
 
    const text = {
@@ -72,6 +75,47 @@
        loadCredentials();
      }, [])
    );
+      const PickAndUploadImage = async ()=>{
+      
+        let result = await ImagePicker.launchImageLibraryAsync({
+         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+         allowsEditing: true,
+         aspect : [1,1],
+         quality: 0.8
+
+        });
+         if(!result.canceled){
+             const uri = result.assets[0].uri;
+             setProfilePic(uri); // Show local 
+
+
+             //form data for backend
+             const formData = new FormData();
+      formData.append('photo', {
+        uri: Platform.OS === 'ios' ? uri.replace('file://', '') : uri,
+        name: 'profile.jpg',
+        type: 'image/jpeg',
+
+         });
+         formData.append('userId', storedIdentity || nin || 'unknown');
+
+         try {
+        
+        const response = await axios.post('http://192.168.5.196:3000/api/upload-profile-pic', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        setProfilePic(response.data.imageUrl); 
+        Alert.alert('Success', 'Profile picture updated!');
+      } catch (error) {
+        console.error('Upload error:', error);
+        Alert.alert('Error', 'Failed to upload image.');
+      }
+    }
+   };
+
       
    const handleGetdata = async () => {
       try {
@@ -122,15 +166,29 @@
      <SafeAreaView style={styles.safeArea}>
        <StatusBar barStyle="light-content" backgroundColor="#09156e" />
        <ScrollView contentContainerStyle={styles.content}>
-         <View style={styles.heading}>
-           <Text style={styles.eyebrow}>
-             {text.storedId}: {storedIdentity || nin || 'None'}
-           </Text>
-           <Text style={styles.eyebrow}>
-             {text.storedPass}: {storedPassword || 'None'}
-           </Text>
-           <Text style={styles.title}>{text.title}</Text>
-         </View>
+
+        <View style={styles.heading}>
+          <View>
+            <Text style={styles.eyebrow}>
+              {text.storedId}: { nin || storedIdentity  || 'None'}
+            </Text>
+            <Text style={styles.eyebrow}>
+              {text.storedPass}: {password || storedPassword || 'None'}
+            </Text>
+            <Text style={styles.title}>{text.title}</Text>
+          </View>
+
+          {/* Profile Picture at Top Right */}
+          <Pressable onPress={PickAndUploadImage} style={styles.profilePicContainer}>
+            {profilePic ? (
+              <Image source={{ uri: profilePic }} style={styles.profilePic} />
+            ) : (
+              <View style={styles.profilePicPlaceholder}>
+                <Text style={styles.profilePicText}>+</Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
 
 
          <View style={styles.apiButtonsContainer}>
@@ -220,6 +278,31 @@
      fontSize: 28,
      fontWeight: '800',
    },
+
+    profilePicContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    overflow: 'hidden',
+    backgroundColor: '#202957',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#bd8aff',
+  },
+  profilePic: {
+    width: '100%',
+    height: '100%',
+  },
+  profilePicPlaceholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profilePicText: {
+    color: '#bd8aff',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
 
 apiButtonsContainer: {
     flexDirection: 'row',
