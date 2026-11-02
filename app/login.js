@@ -196,11 +196,17 @@ const {setIsLoading} = useLoading();
       if (response && response.status === 200) {
         setNin(identity.trim());
 
-        // ADD THESE TWO LINES TO OVERWRITE OLD STORAGE
         await AsyncStorage.setItem('saved_identity', identity.trim());
         await AsyncStorage.setItem('saved_password', password);
 
-        navigation.navigate('Home'); 
+        // Check if this specific IQAMA ID has completed the tutorial
+        const hasSeenTutorial = await AsyncStorage.getItem(`@tutorialCompleted_${identity.trim()}`);
+        
+        if (hasSeenTutorial === 'true') {
+          navigation.replace('Home'); 
+        } else {
+          navigation.replace('Tutorial', { identity: identity.trim() }); 
+        }
       }
     } catch (error) {
       setIsLoading(false);
@@ -213,7 +219,6 @@ const {setIsLoading} = useLoading();
       }
     }
   };
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0f143a' }} edges={['top', 'bottom']}>
       <StatusBar barStyle="light-content" backgroundColor="#0f143a" />

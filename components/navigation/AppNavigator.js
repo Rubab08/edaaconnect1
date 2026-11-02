@@ -16,6 +16,7 @@ import SettingsScreen from '../../app/settings';
 import TestScreen from '../../app/TestScreen';
 import StatsScreen from '../../app/stats';
 import DemoScreen from '../../app/demo';
+import TutorialScreen from '../../app/tutorial';
 import { Menu } from '@gluestack-ui/themed';
 
 const Stack = createNativeStackNavigator();
@@ -163,7 +164,12 @@ export default function AppNavigator() {
           component={HomeDrawer} 
           options={{ headerShown: false }} 
         />
-        
+
+        <Stack.Screen 
+          name="Tutorial" 
+          component={TutorialScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
