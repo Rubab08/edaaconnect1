@@ -1,6 +1,7 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useRef } from 'react';
+import { StyleSheet, Text, View, Alert } from 'react-native';
+import UserInactivity from 'react-native-user-inactivity';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -17,7 +18,6 @@ import TestScreen from '../../app/TestScreen';
 import StatsScreen from '../../app/stats';
 import DemoScreen from '../../app/demo';
 import TutorialScreen from '../../app/tutorial';
-import { Menu } from '@gluestack-ui/themed';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -57,7 +57,45 @@ function CustomDrawerContent(props) {
 }
 
 function HomeDrawer() {
+
+const navigation = useNavigation();
+const alertshown = useRef(false);
+
+const handleInactivity = (isInactive) => {
+  if (isInactive && !alertshown.current) {
+    alertshown.current = true;
+    Alert.alert(
+      "session Expired",
+      "You have been inactive for a while. Please log in again.",
+      [
+        {
+          text: "OK",
+          onPress: () => {
+            navigation.navigate('Onboarding');
+          },
+        },
+      ],
+       { cancelable : false}
+    );
+    
+  }
+  if (!isInactive) {
+      alertshown.current = false;
+    }
+  };
+ 
+
+
+
+
   return (
+
+
+    <UserInactivity
+      timeForInactivity={5000}
+      onAction={handleInactivity}
+      style={{ flex: 1 }}
+    >
     <Drawer.Navigator
       initialRouteName="HomeMain"
       screenOptions={{
@@ -106,6 +144,7 @@ function HomeDrawer() {
       <Drawer.Screen name="Demo" component={DemoScreen} />
       <Drawer.Screen name="TestScreen" component={TestScreen} />
     </Drawer.Navigator>
+    </UserInactivity>
   );
 }
 

@@ -13,7 +13,6 @@ export default function TestScreen() {
   const [users, setUsers] = useState([]);
   const [department, setDepartment] = useState([]);
 
-  // GET for user and department
   const loadScreenData = async () => {
     try {
       const usersData = await getRequest(GET_USERS);
@@ -27,7 +26,21 @@ export default function TestScreen() {
   };
 
   useEffect(() => {
-    loadScreenData();
+    let isMounted = true;
+
+    Promise.all([getRequest(GET_USERS), getRequest(GET_DEPARTMENT)])
+      .then(([usersData, deptData]) => {
+        if (!isMounted) return;
+        setUsers(usersData);
+        setDepartment(deptData);
+      })
+      .catch((error) => {
+        console.error('Error fetching screen data:', error);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   //  POST for User

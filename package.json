@@ -6,6 +6,7 @@
     "@expo/react-native-action-sheet": "^4.1.1",
     "@expo/ui": "~57.0.21",
     "@expo/vector-icons": "^15.0.2",
+    "@gluestack-style/react": "1.0.57",
     "@gluestack-ui/config": "^1.1.20",
     "@gluestack-ui/themed": "^1.1.73",
     "@react-native-aria/accordion": "^0.0.2",
@@ -43,6 +44,7 @@
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
     "react-native-svg": "15.15.4",
+    "react-native-user-inactivity": "^1.2.0",
     "react-native-web": "^0.21.2",
     "react-native-worklets": "0.10.1",
     "socket.io": "^4.8.4",
@@ -54,7 +56,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint app components App.js index.js"
   },
   "private": true,
   "devDependencies": {
@@ -62,6 +64,7 @@
     "eslint": "^9.0.0",
     "eslint-config-expo": "~57.0.2",
     "prettier-plugin-tailwindcss": "^0.5.14",
-    "tailwindcss": "^3.4.19"
+    "tailwindcss": "^3.4.19",
+    "typescript": "~6.0.3"
   }
 }

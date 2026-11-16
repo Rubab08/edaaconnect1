@@ -45,7 +45,7 @@
    const carouselWidth = Math.max(width - 40, 0);
    const [storedIdentity, setStoredIdentity] = useState('');
    const [storedPassword, setStoredPassword] = useState('');
-   const [apiResponse, setApiResponse] = useState('');
+   // const [apiResponse, setApiResponse] = useState('');
    const [profilePic, setProfilePic] = useState(null);
    const { nin , password } = useUser();
    const { t } = useTranslation();
@@ -117,6 +117,7 @@
    };
 
       
+   /*
    const handleGetdata = async () => {
       try {
         const response = await axios.get('https://jsonplaceholder.typicode.com/posts/1')
@@ -141,8 +142,9 @@
         Alert.alert('Error', 'Failed to post data.');
       }
     };
+    */
 
-  /* const handleWelcomeNotification = async () => {
+   const handleWelcomeNotification = async () => {
      if (Platform.OS !== 'ios') return;
 
        try {
@@ -160,7 +162,7 @@
          console.error('Error scheduling notification', error);
          Alert.alert('Notification error', 'The notification could not be scheduled.');
        }
-   }; */
+   }; 
 
    return (
      <SafeAreaView style={styles.safeArea}>
@@ -168,7 +170,7 @@
        <ScrollView contentContainerStyle={styles.content}>
 
         <View style={styles.heading}>
-          <View>
+          <View style={styles.profileDetails}>
             <Text style={styles.eyebrow}>
               {text.storedId}: { nin || storedIdentity  || 'None'}
             </Text>
@@ -191,6 +193,7 @@
         </View>
 
 
+         {/*
          <View style={styles.apiButtonsContainer}>
            <Pressable style={styles.actionBtn} onPress={handleGetdata}>
              <Text style={styles.btnText}>Get Data</Text>
@@ -205,9 +208,10 @@
         </View>
          ) 
         }
+         */}
                 
 
-         {/* {Platform.OS === 'ios' && (
+          {Platform.OS === 'ios' && (
            <Pressable
              accessibilityRole="button"
              onPress={handleWelcomeNotification}
@@ -215,7 +219,7 @@
            >
              <Text style={styles.btnText}>Notify me</Text>
            </Pressable>
-         )} */}
+         )} 
 
          <View style={styles.carouselFrame}>
            <Carousel
@@ -262,9 +266,16 @@
      paddingBottom: 32,
    },
    heading: {
+     flexDirection: 'row',
+     alignItems: 'center',
+     justifyContent: 'space-between',
+     gap: 16,
      width: '100%',
      maxWidth: 520,
      marginBottom: 22,
+   },
+   profileDetails: {
+     flex: 1,
    },
    eyebrow: {
      color: '#bd8aff',

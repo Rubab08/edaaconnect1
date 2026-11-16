@@ -335,23 +335,25 @@ const {setIsLoading} = useLoading();
               <View style={{ height: 1, flex: 1, backgroundColor: '#334155' }} />
             </View>
 
-            {/* Biometric Button */}
-            <Pressable onPress={handleBiometricLogin} style={{ alignSelf: 'center', alignItems: 'center', marginTop: 10 }}>
-              <View style={{ width: 75, height: 60, borderWidth: 1, borderColor: '#f8fafc', borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons name="finger-print-outline" size={32} color="#f8fafc" />
-              </View>
-              <Text style={{ color: '#fff', fontSize: 15, marginTop: 10 }}>{text.biometric}</Text>
-            </Pressable>
+            <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'center', alignItems: 'flex-start', gap: 24, marginTop: 10 }}>
+              {/* Biometric Button */}
+              <Pressable onPress={handleBiometricLogin} style={{ width: 110, alignItems: 'center' }}>
+                <View style={{ width: 75, height: 60, borderWidth: 1, borderColor: '#f8fafc', borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons name="finger-print-outline" size={32} color="#f8fafc" />
+                </View>
+                <Text style={{ color: '#fff', fontSize: 15, marginTop: 10, textAlign: 'center' }}>{text.biometric}</Text>
+              </Pressable>
 
-            {/* Face ID Button */}
-            <Pressable onPress={handleFaceIdLogin} style={{ alignSelf: 'center', alignItems: 'center', marginTop: 10 }}>
-              <View style={{ width: 75, height: 60, borderWidth: 1, borderColor: '#f8fafc', borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons name="scan-outline" size={32} color="#f8fafc" />
-              </View>
-              <Text style={{ color: '#fff', fontSize: 15, marginTop: 10 }}>
-                {text.faceId}
-              </Text>
-            </Pressable>
+              {/* Face ID Button */}
+              <Pressable onPress={handleFaceIdLogin} style={{ width: 110, alignItems: 'center' }}>
+                <View style={{ width: 75, height: 60, borderWidth: 1, borderColor: '#f8fafc', borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons name="scan-outline" size={32} color="#f8fafc" />
+                </View>
+                <Text style={{ color: '#fff', fontSize: 15, marginTop: 10, textAlign: 'center' }}>
+                  {text.faceId}
+                </Text>
+              </Pressable>
+            </View>
 
             
 
