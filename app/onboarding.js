@@ -1,3 +1,5 @@
+import { useAppTheme } from '../components/theme/ThemeManager';
+//import ThemeToggle from '../components/theme/ThemeToggle';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {
 	Image,
@@ -13,6 +15,7 @@ import { useTranslation } from '../components/providers/LanguageContext';
 
 export default function OnboardingScreen({ navigation }) {
 	const { t, language, toggleLanguage } = useTranslation();
+  const { theme } = useAppTheme();
 	const text = {
 		title: t('welcomeTitle'),
 		language: language === 'en' ? 'العربية' : 'English',
@@ -22,19 +25,19 @@ export default function OnboardingScreen({ navigation }) {
 	};
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#1e2343' }} edges={['top', 'bottom']}>
-			<StatusBar barStyle="light-content" backgroundColor="#1e2343" />
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.onboardingBackground }} edges={['top', 'bottom']}>
+			<StatusBar barStyle={theme.statusBarStyle} backgroundColor="#1e2343" />
 			<View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 8 }}>
 				<View style={{ height: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-					<Text style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: '700' }}>{text.title}</Text>
+					<Text style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', color: theme.onboardingTitle, fontSize: 20, fontWeight: '700' }}>{text.title}</Text>
 					<Pressable
 						accessibilityRole="button"
 						accessibilityLabel={language === 'en' ? 'Change language' : 'تغيير اللغة'}
 						onPress={toggleLanguage}
 						style={{ flexDirection: 'row', alignItems: 'center', gap: 8, zIndex: 1 }}
 					>
-						<Ionicons name="sunny" size={24} color="#fff" />
-						<Text style={{ color: '#fff', fontSize: 16, fontWeight: '500' }}>{text.language}</Text>
+						<Ionicons name="language-outline" size={20} color={theme.languageText} />
+						<Text style={{ color: theme.languageText, fontSize: 16, fontWeight: '500' }}>{text.language}</Text>
 					</Pressable>
 				</View>
 
@@ -51,23 +54,24 @@ export default function OnboardingScreen({ navigation }) {
 					<Pressable
 						accessibilityRole="button"
 						onPress={() => navigation.navigate('Login')}
-						style={{ height: 48, borderRadius: 9, backgroundColor: '#8124ee', alignItems: 'center', justifyContent: 'center', marginBottom: 32 }}
+						style={{ height: 48, borderRadius: 9, backgroundColor: theme.loginButton, alignItems: 'center', justifyContent: 'center', marginBottom: 32 }}
 					>
-						<Text style={{ color: '#fff', fontSize: 19, fontWeight: '500' }}>{text.login}</Text>
+						<Text style={{ color: theme.loginButtonText, fontSize: 19, fontWeight: '500' }}>{text.login}</Text>
 					</Pressable>
 					<Pressable
 						accessibilityRole="button"
 						onPress={() => navigation.navigate('Register')}
-						style={{ height: 48, borderRadius: 9, backgroundColor: '#3c30b7', alignItems: 'center', justifyContent: 'center' }}
+						style={{ height: 48, borderRadius: 9, backgroundColor: theme.registerButton, alignItems: 'center', justifyContent: 'center' }}
 					>
-						<Text style={{ color: '#fff', fontSize: 18, fontWeight: '500', textAlign: 'center' }}>{text.createAccount}</Text>
+						<Text style={{ color: theme.registerButtonText, fontSize: 18, fontWeight: '500', textAlign: 'center' }}>{text.createAccount}</Text>
 					</Pressable>
 				</View>
 
-				<View style={{ borderTopWidth: 0.5, borderTopColor: 'rgba(255,255,255,0.65)', paddingTop: 7, paddingBottom: 4, marginHorizontal: 10 }}>
-					<Text style={{ color: '#fff', textAlign: 'center', fontSize: 14, lineHeight: 22 }}>{text.copyright}</Text>
+				<View style={{ borderTopWidth: 0.5, borderTopColor: theme.footerBorder, paddingTop: 7, paddingBottom: 4, marginHorizontal: 10 }}>
+					<Text style={{ color: theme.copyrightText, textAlign: 'center', fontSize: 14, lineHeight: 22 }}>{text.copyright}</Text>
 				</View>
 			</View>
-		</SafeAreaView>
+		{/*<ThemeToggle />*/}
+    </SafeAreaView>
 	);
 }

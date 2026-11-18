@@ -1,3 +1,5 @@
+import { useAppTheme } from '../components/theme/ThemeManager';
+//import ThemeToggle from '../components/theme/ThemeToggle';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert, ScrollView } from 'react-native';
 import { getRequest } from '../components/mainURL.js';
@@ -5,6 +7,8 @@ import { postRequest } from '../components/mainURL.js';
 import { GET_USERS, SAVE_USER, GET_DEPARTMENT, SAVE_DEPARTMENT } from '../components/EndPoints.js';
 
 export default function TestScreen() {
+  const { theme } = useAppTheme();
+  const styles = createStyles(theme);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [departmentName, setdepartmentName] = useState('');
@@ -82,12 +86,13 @@ export default function TestScreen() {
 
   return (
     <ScrollView style={styles.container}>
+      {/*<ThemeToggle />*/}
       
       {/* 1. USER ENTRY  */}
       <View style={styles.formSection}>
         <Text style={styles.header}>Add New User</Text>
-        <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
-        <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
+        <TextInput style={[styles.input, { color: theme.inputText, backgroundColor: theme.inputBackground, borderColor: theme.inputBorder }]} placeholderTextColor={theme.placeholder} placeholder="Name" value={name} onChangeText={setName} />
+        <TextInput style={[styles.input, { color: theme.inputText, backgroundColor: theme.inputBackground, borderColor: theme.inputBorder }]} placeholderTextColor={theme.placeholder} placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
         <TouchableOpacity style={styles.button} onPress={handleSaveUser}>
           <Text style={styles.buttonText}>Save User</Text>
         </TouchableOpacity>
@@ -96,7 +101,7 @@ export default function TestScreen() {
       {/* 2. DEPARTMENT ENTRY */}
       <View style={styles.formSection}>
         <Text style={styles.header}>Add New Department</Text>
-        <TextInput style={styles.input} placeholder="Department Name (e.g., IT)" value={departmentName} onChangeText={setdepartmentName} />
+        <TextInput style={[styles.input, { color: theme.inputText, backgroundColor: theme.inputBackground, borderColor: theme.inputBorder }]} placeholderTextColor={theme.placeholder} placeholder="Department Name (e.g., IT)" value={departmentName} onChangeText={setdepartmentName} />
         <TouchableOpacity style={styles.button} onPress={handleSaveDepartment}>
           <Text style={styles.buttonText}>Save Department</Text>
         </TouchableOpacity>
@@ -141,16 +146,16 @@ export default function TestScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#20205f', marginTop: 40 },
-  formSection: { marginBottom: 30, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: '#3a3a8a' },
-  header: { fontSize: 22, fontWeight: 'bold', marginBottom: 15, color: 'white' },
-  subHeader: { fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10, color: 'white' },
-  input: { backgroundColor: 'white', padding: 15, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: '#ddd' },
-  button: { backgroundColor: '#bd8aff', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 5 },
-  refreshButton: { backgroundColor: '#3a3a8a', padding: 15, borderRadius: 8, alignItems: 'center', marginVertical: 10 },
-  buttonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
-  card: { backgroundColor: 'white', padding: 15, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: '#eee' },
+const createStyles = (theme) => StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: theme.background, marginTop: 40 },
+  formSection: { marginBottom: 30, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: theme.border },
+  header: { fontSize: 22, fontWeight: 'bold', marginBottom: 15, color: theme.text },
+  subHeader: { fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10, color: theme.text },
+  input: { backgroundColor: theme.surface, padding: 15, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: theme.border },
+  button: { backgroundColor: theme.accent, padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 5 },
+  refreshButton: { backgroundColor: theme.accent, padding: 15, borderRadius: 8, alignItems: 'center', marginVertical: 10 },
+  buttonText: { color: theme.text, fontWeight: 'bold', fontSize: 16 },
+  card: { backgroundColor: theme.surface, padding: 15, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: theme.border },
   text: { fontSize: 16 },
-  emptyText: { color: '#bd8aff', fontStyle: 'italic' }
+  emptyText: { color: theme.accent, fontStyle: 'italic' }
 });

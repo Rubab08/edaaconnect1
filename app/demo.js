@@ -1,3 +1,5 @@
+import { useAppTheme } from '../components/theme/ThemeManager';
+//import ThemeToggle from '../components/theme/ThemeToggle';
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,6 +10,7 @@ import { getRequest } from '../components/mainURL.js';
 import { GET_DEMO } from '../components/EndPoints.js'; 
 
 const Demo = () => {
+  const { theme } = useAppTheme();
   const [chartData, setChartData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,19 +32,19 @@ const Demo = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#1A1B41' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
         
         {/* Header */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width: 1, height: 30, backgroundColor: '#4A4A6A', marginRight: 10 }} />
-            <Ionicons name="menu" size={24} color="white" />
+            <View style={{ width: 1, height: 30, backgroundColor: theme.surfaceAlt, marginRight: 10 }} />
+            <Ionicons name="menu" size={24} color={theme.text} />
           </View>
-          <Text style={{ color: 'white', fontSize: 17, fontWeight: '600' }}>Portfolio Performance</Text>
+          <Text style={{ color: theme.text, fontSize: 17, fontWeight: '600' }}>Portfolio Performance</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="search" size={24} color="white" style={{ marginRight: 14 }} />
-            <Ionicons name="notifications-outline" size={24} color="white" />
+            <Ionicons name="search" size={24} color={theme.text} style={{ marginRight: 14 }} />
+            <Ionicons name="notifications-outline" size={24} color={theme.text} />
           </View>
         </View>
 
@@ -49,7 +52,7 @@ const Demo = () => {
         <View style={{ paddingHorizontal: 20, marginTop: 30, alignItems: 'center' }}>
           {isLoading ? (
             <View style={{ height: 250, justifyContent: 'center' }}>
-              <ActivityIndicator size="large" color="#D8B4FF" />
+              <ActivityIndicator size="large" color={theme.accent} />
             </View>
           ) : (
             <VictoryChart width={380} height={300}>
@@ -67,8 +70,8 @@ const Demo = () => {
               {/* X Axis */}
               <VictoryAxis 
                 style={{ 
-                  axis: { stroke: "#4A4A6A" }, 
-                  tickLabels: { fill: "#8892B0", fontSize: 12, padding: 10 } 
+                  axis: { stroke: theme.border }, 
+                  tickLabels: { fill: theme.muted, fontSize: 12, padding: 10 } 
                 }} 
               />
               
@@ -77,8 +80,8 @@ const Demo = () => {
                 dependentAxis 
                 tickFormat={(t) => `$${t / 1000}k`}
                 style={{ 
-                  axis: { stroke: "#4A4A6A" }, 
-                  tickLabels: { fill: "#8892B0", fontSize: 12, padding: 10 },
+                  axis: { stroke: theme.border }, 
+                  tickLabels: { fill: theme.muted, fontSize: 12, padding: 10 },
                   grid: { stroke: "rgba(255, 255, 255, 0.07)" }
                 }} 
               />
@@ -89,7 +92,7 @@ const Demo = () => {
                 style={{
                   data: { 
                     fill: "url(#areaGradient)",
-                    stroke: "#D8B4FF",         
+                    stroke: theme.accent,         
                     strokeWidth: 3 
                   }
                 }}
@@ -99,8 +102,8 @@ const Demo = () => {
                 size={4}
                 style={{
                   data: { 
-                    fill: "#8A2BE2",      
-                    stroke: "#D8B4FF",    
+                    fill: theme.accent,      
+                    stroke: theme.accent,    
                     strokeWidth: 1 
                   }
                 }}
@@ -113,28 +116,29 @@ const Demo = () => {
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <View style={{ position: 'absolute', bottom: 0, width: '100%', backgroundColor: '#0A1128', flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 15, paddingBottom: 25, borderTopWidth: 1, borderTopColor: '#1A1B41' }}>
+      <View style={{ position: 'absolute', bottom: 0, width: '100%', backgroundColor: theme.navBackground, flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 15, paddingBottom: 25, borderTopWidth: 1, borderTopColor: theme.border }}>
         <TouchableOpacity style={{ alignItems: 'center' }}>
-          <Ionicons name="folder-outline" size={20} color="#8892B0" />
-          <Text style={{ color: '#8892B0', fontSize: 10, marginTop: 4 }}>Portfolio</Text>
+          <Ionicons name="folder-outline" size={20} color={theme.muted} />
+          <Text style={{ color: theme.muted, fontSize: 10, marginTop: 4 }}>Portfolio</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{ alignItems: 'center' }}>
-          <Ionicons name="document-text-outline" size={20} color="#8892B0" />
-          <Text style={{ color: '#8892B0', fontSize: 10, marginTop: 4 }}>A/c Stmt</Text>
+          <Ionicons name="document-text-outline" size={20} color={theme.muted} />
+          <Text style={{ color: theme.muted, fontSize: 10, marginTop: 4 }}>A/c Stmt</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{ alignItems: 'center' }}>
-          <Ionicons name="stats-chart-outline" size={20} color="#8892B0" />
-          <Text style={{ color: '#8892B0', fontSize: 10, marginTop: 4 }}>Market</Text>
+          <Ionicons name="stats-chart-outline" size={20} color={theme.muted} />
+          <Text style={{ color: theme.muted, fontSize: 10, marginTop: 4 }}>Market</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{ alignItems: 'center' }}>
-          <Ionicons name="receipt-outline" size={20} color="#8892B0" />
-          <Text style={{ color: '#8892B0', fontSize: 10, marginTop: 4 }}>Order List</Text>
+          <Ionicons name="receipt-outline" size={20} color={theme.muted} />
+          <Text style={{ color: theme.muted, fontSize: 10, marginTop: 4 }}>Order List</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{ alignItems: 'center' }}>
-          <Ionicons name="wallet-outline" size={20} color="#8892B0" />
-          <Text style={{ color: '#8892B0', fontSize: 10, marginTop: 4 }}>Wallet</Text>
+          <Ionicons name="wallet-outline" size={20} color={theme.muted} />
+          <Text style={{ color: theme.muted, fontSize: 10, marginTop: 4 }}>Wallet</Text>
         </TouchableOpacity>
       </View>
+    {/*<ThemeToggle />*/}
     </SafeAreaView>
   );
 };

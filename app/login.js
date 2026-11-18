@@ -1,4 +1,5 @@
-
+import { useAppTheme } from '../components/theme/ThemeManager';
+//import ThemeToggle from '../components/theme/ThemeToggle';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -23,7 +24,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useLoading } from '../components/providers/LoadingContext';
 
-function BackgroundPattern() {
+function BackgroundPattern({ theme }) {
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       <View style={{ ...StyleSheet.absoluteFillObject, overflow: 'hidden' }}>
@@ -39,7 +40,7 @@ function BackgroundPattern() {
               <Text
                 key={column}
                 style={{
-                  color: '#43257f',
+                  color: theme.text,
                   opacity: 0.15,
                   fontSize: 24,
                   fontWeight: '800',
@@ -52,7 +53,7 @@ function BackgroundPattern() {
           </View>
         ))}
       </View>
-      
+
       {/* Bottom glowing columns */}
       <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '25%', backgroundColor: 'rgba(57, 34, 150, 0.4)' }} />
       {[
@@ -73,25 +74,27 @@ function BackgroundPattern() {
   );
 }
 
-function BrandMark() {
+function BrandMark({ theme }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <Image 
+      <Image
         source={require('../assets/edaa-connect-icon.png')}
-        style={{ width: 32, height: 32, resizeMode: 'contain' }} 
+        style={{ width: 32, height: 32, resizeMode: 'contain' }}
       />
-      <View style={{ width: 1.5, height: 28, marginLeft: 12, backgroundColor: '#cbd5e1' }} />
+      <View style={{ width: 1.5, height: 28, marginLeft: 12, backgroundColor: theme.surfaceAlt }} />
     </View>
   );
 }
 
 export default function LoginScreen({ navigation }) {
+  const { theme } = useAppTheme();
   const [identity, setIdentity] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
   const { setNin } = useUser();
   const { t, language, toggleLanguage, isRtl } = useTranslation();
+  const { setIsLoading } = useLoading();
 
   const text = {
     title: t('loginTitle'),
@@ -135,11 +138,9 @@ export default function LoginScreen({ navigation }) {
     });
 
     if (auth.success) {
-        navigation.navigate('Home');
+      navigation.navigate('Home');
     }
   };
-
-
 
   const handleFaceIdLogin = async () => {
     if (Platform.OS === 'web') {
@@ -180,7 +181,7 @@ export default function LoginScreen({ navigation }) {
       Alert.alert(text.title, text.biometricFailed);
     }
   };
-const {setIsLoading} = useLoading();
+
   const handleLogin = async () => {
     if (!identity.trim() || !password) {
       Alert.alert(text.title, 'Please enter both Identity and Password');
@@ -190,7 +191,7 @@ const {setIsLoading} = useLoading();
     try {
       const response = await postRequest(LOGIN_USER, {
         identity: identity.trim(),
-        password: password
+        password: password,
       });
 
       if (response && response.status === 200) {
@@ -199,30 +200,36 @@ const {setIsLoading} = useLoading();
         await AsyncStorage.setItem('saved_identity', identity.trim());
         await AsyncStorage.setItem('saved_password', password);
 
-        // Check if this specific IQAMA ID has completed the tutorial
         const hasSeenTutorial = await AsyncStorage.getItem(`@tutorialCompleted_${identity.trim()}`);
-        
+
         if (hasSeenTutorial === 'true') {
-          navigation.replace('Home'); 
+          navigation.replace('Home');
         } else {
-          navigation.replace('Tutorial', { identity: identity.trim() }); 
+          navigation.replace('Tutorial', { identity: identity.trim() });
         }
       }
     } catch (error) {
       setIsLoading(false);
-      
+
       if (error.response && error.response.status === 401) {
-        Alert.alert('Login Failed', 'User does not match our records.'); 
+        Alert.alert('Login Failed', 'User does not match our records.');
       } else {
         Alert.alert('Error', 'Server error or connection failed');
         console.error('Login request error:', error);
       }
     }
   };
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f143a' }} edges={['top', 'bottom']}>
-      <StatusBar barStyle="light-content" backgroundColor="#0f143a" />
-      <BackgroundPattern />
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: theme.background }}
+      edges={['top', 'bottom']}
+    >
+      <StatusBar
+        barStyle={theme.statusBarStyle}
+        backgroundColor={theme.background}
+      />
+      <BackgroundPattern theme={theme} />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -235,14 +242,37 @@ const {setIsLoading} = useLoading();
         >
           {/* Header */}
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', zIndex: 10 }}>
-            <BrandMark />
-            <Text style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', color: '#fff', fontSize: 18, fontWeight: '700' }}>
+            <BrandMark theme={theme} />
+
+            <Text
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                textAlign: 'center',
+                color: theme.text,
+                fontSize: 18,
+                fontWeight: '700',
+              }}
+            >
               {text.title}
             </Text>
-            <Pressable onPress={toggleLanguage} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Ionicons name="sunny-outline" size={22} color="#fff" />
-              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '500' }}>{text.language}</Text>
-            </Pressable>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <Pressable
+                onPress={toggleLanguage}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
+              >
+                <Ionicons
+                  name="language-outline"
+                  size={20}
+                  color={theme.text}
+                />
+                <Text style={{ color: theme.text, fontSize: 15, fontWeight: '500' }}>
+                  {text.language}
+                </Text>
+              </Pressable>
+            </View>
           </View>
 
           {/* Top Navigation Row: Back Button */}
@@ -251,7 +281,11 @@ const {setIsLoading} = useLoading();
               onPress={() => navigation?.canGoBack?.() && navigation.goBack()}
               style={{ width: 40, height: 40, justifyContent: 'center' }}
             >
-              <Ionicons name={isRtl ? 'arrow-forward' : 'arrow-back'} size={26} color="#fff" />
+              <Ionicons
+                name={isRtl ? 'arrow-forward' : 'arrow-back'}
+                size={26}
+                color={theme.text}
+              />
             </Pressable>
 
             <View style={{ width: 40, height: 40 }} />
@@ -260,118 +294,268 @@ const {setIsLoading} = useLoading();
           {/* Form */}
           <View style={{ marginTop: 24 }}>
             {/* Identity Input */}
-            <Text style={{ color: '#f8fafc', fontSize: 15, marginBottom: 8, textAlign: isRtl ? 'right' : 'left' }}>
+            <Text
+              style={{
+                color: theme.text,
+                fontSize: 15,
+                marginBottom: 8,
+                textAlign: isRtl ? 'right' : 'left',
+              }}
+            >
               {text.identity}
             </Text>
             <TextInput
               value={identity}
               onChangeText={setIdentity}
               placeholder={text.identityPlaceholder}
-              placeholderTextColor="#68788c"
+              placeholderTextColor={theme.placeholder}
               keyboardType="default"
               autoCapitalize="none"
               style={[
-                { height: 52, borderRadius: 8, backgroundColor: '#0c223a', paddingHorizontal: 16, color: '#fff', fontSize: 15, marginBottom: 20 },
-                isRtl && { textAlign: 'right' }
+                {
+                  height: 52,
+                  borderRadius: 8,
+                  backgroundColor: theme.inputBackground,
+                  borderWidth: 0,
+                  borderColor: theme.border,
+                  paddingHorizontal: 16,
+                  color: theme.text,
+                  fontSize: 15,
+                  marginBottom: 20,
+                },
+                isRtl && { textAlign: 'right' },
               ]}
             />
 
             {/* Password Input */}
-            <Text style={{ color: '#f8fafc', fontSize: 15, marginBottom: 8, textAlign: isRtl ? 'right' : 'left' }}>
+            <Text
+              style={{
+                color: theme.text,
+                fontSize: 15,
+                marginBottom: 8,
+                textAlign: isRtl ? 'right' : 'left',
+              }}
+            >
               {text.password}
             </Text>
-            <View style={{ height: 52, borderRadius: 8, backgroundColor: '#0c223a', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16 }}>
+            <View
+              style={{
+                height: 52,
+                borderRadius: 8,
+                backgroundColor: theme.inputBackground,
+                borderWidth: 0,
+                borderColor: theme.border,
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingHorizontal: 16,
+              }}
+            >
               <TextInput
                 value={password}
                 onChangeText={setPassword}
                 placeholder={text.passwordPlaceholder}
-                placeholderTextColor="#68788c"
+                placeholderTextColor={theme.placeholder}
                 secureTextEntry={!showPassword}
                 style={[
-                  { flex: 1, height: '100%', color: '#fff', fontSize: 15 },
-                  isRtl && { textAlign: 'right' }
+                  { flex: 1, height: '100%', color: theme.text, fontSize: 15 },
+                  isRtl && { textAlign: 'right' },
                 ]}
               />
               <Pressable
                 onPress={() => setShowPassword(!showPassword)}
                 style={{ width: 40, height: 52, alignItems: 'flex-end', justifyContent: 'center' }}
               >
-                <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={22} color="#f8fafc" />
+                <Ionicons
+                  name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                  size={22}
+                  color={theme.text}
+                />
               </Pressable>
             </View>
 
             {/* Options Row */}
-            <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 20 }}>
+            <View
+              style={{
+                flexDirection: isRtl ? 'row-reverse' : 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: 20,
+              }}
+            >
               <Pressable
                 onPress={() => setKeepSignedIn(!keepSignedIn)}
                 style={{ flexDirection: isRtl ? 'row-reverse' : 'row', alignItems: 'center', gap: 10 }}
               >
-                <View style={[
-                  { width: 44, height: 26, borderWidth: 1, borderColor: '#475569', borderRadius: 15, justifyContent: 'center', paddingHorizontal: 2 },
-                  keepSignedIn && { borderColor: '#a855f7' }
-                ]}>
-                  <View style={[
-                    { width: 20, height: 20, borderRadius: 10, backgroundColor: '#94a3b8' },
-                    keepSignedIn && { alignSelf: 'flex-end', backgroundColor: '#c084fc' }
-                  ]} />
+                <View
+                  style={[
+                    {
+                      width: 44,
+                      height: 26,
+                      borderWidth: 1,
+                      borderColor: theme.border,
+                      borderRadius: 15,
+                      justifyContent: 'center',
+                      paddingHorizontal: 2,
+                    },
+                    keepSignedIn && { borderColor: theme.border },
+                  ]}
+                >
+                  <View
+                    style={[
+                      {
+                        width: 20,
+                        height: 20,
+                        borderRadius: 10,
+                        backgroundColor: theme.surfaceAlt,
+                      },
+                      keepSignedIn && { alignSelf: 'flex-end', backgroundColor: theme.surfaceAlt },
+                    ]}
+                  />
                 </View>
-                <Text style={{ color: '#fff', fontSize: 15 }}>{text.keepSignedIn}</Text>
+                <Text style={{ color: theme.text, fontSize: 15 }}>
+                  {text.keepSignedIn}
+                </Text>
               </Pressable>
-              
+
               <Pressable onPress={() => Alert.alert(text.forgotPassword)}>
-                <Text style={{ color: '#fff', fontSize: 15 }}>{text.forgotPassword}</Text>
+                <Text style={{ color: theme.text, fontSize: 15 }}>
+                  {text.forgotPassword}
+                </Text>
               </Pressable>
             </View>
 
             {/* Login Button */}
-            <Pressable onPress={handleLogin} style={{ height: 54, borderRadius: 10, backgroundColor: '#8b3dff', alignItems: 'center', justifyContent: 'center', marginTop: 32 }}>
-              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>{text.login}</Text>
+            <Pressable
+              onPress={handleLogin}
+              style={{
+                height: 54,
+                borderRadius: 10,
+                backgroundColor: theme.accent,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 32,
+              }}
+            >
+              <Text style={{ color: theme.text, fontSize: 18, fontWeight: '600' }}>{text.login}</Text>
             </Pressable>
 
             {/* OR Divider */}
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15, marginTop: 40, marginBottom: 20 }}>
-              <View style={{ height: 1, flex: 1, backgroundColor: '#334155' }} />
-              <Text style={{ color: '#fff', fontSize: 16 }}>{text.or}</Text>
-              <View style={{ height: 1, flex: 1, backgroundColor: '#334155' }} />
+              <View style={{ height: 1, flex: 1, backgroundColor: theme.surfaceAlt }} />
+              <Text style={{ color: theme.text, fontSize: 16 }}>{text.or}</Text>
+              <View style={{ height: 1, flex: 1, backgroundColor: theme.surfaceAlt }} />
             </View>
 
-            <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'center', alignItems: 'flex-start', gap: 24, marginTop: 10 }}>
-              {/* Biometric Button */}
+            {/* Biometric & Face ID */}
+            <View
+              style={{
+                flexDirection: isRtl ? 'row-reverse' : 'row',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+                gap: 24,
+                marginTop: 10,
+              }}
+            >
               <Pressable onPress={handleBiometricLogin} style={{ width: 110, alignItems: 'center' }}>
-                <View style={{ width: 75, height: 60, borderWidth: 1, borderColor: '#f8fafc', borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
-                  <Ionicons name="finger-print-outline" size={32} color="#f8fafc" />
+                <View
+                  style={{
+                    width: 75,
+                    height: 60,
+                    borderWidth: 1,
+                    borderColor: theme.border,
+                    backgroundColor: 'transparent',
+                    borderRadius: 14,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Ionicons
+                    name="finger-print-outline"
+                    size={32}
+                    color={theme.text}
+                  />
                 </View>
-                <Text style={{ color: '#fff', fontSize: 15, marginTop: 10, textAlign: 'center' }}>{text.biometric}</Text>
+                <Text
+                  style={{
+                    color: theme.text,
+                    fontSize: 15,
+                    marginTop: 10,
+                    textAlign: 'center',
+                  }}
+                >
+                  {text.biometric}
+                </Text>
               </Pressable>
 
-              {/* Face ID Button */}
               <Pressable onPress={handleFaceIdLogin} style={{ width: 110, alignItems: 'center' }}>
-                <View style={{ width: 75, height: 60, borderWidth: 1, borderColor: '#f8fafc', borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
-                  <Ionicons name="scan-outline" size={32} color="#f8fafc" />
+                <View
+                  style={{
+                    width: 75,
+                    height: 60,
+                    borderWidth: 1,
+                    borderColor: theme.border,
+                    backgroundColor: 'transparent',
+                    borderRadius: 14,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Ionicons
+                    name="scan-outline"
+                    size={32}
+                    color={theme.text}
+                  />
                 </View>
-                <Text style={{ color: '#fff', fontSize: 15, marginTop: 10, textAlign: 'center' }}>
+                <Text
+                  style={{
+                    color: theme.text,
+                    fontSize: 15,
+                    marginTop: 10,
+                    textAlign: 'center',
+                  }}
+                >
                   {text.faceId}
                 </Text>
               </Pressable>
             </View>
 
-            
-
             {/* Register Link */}
             <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'center', marginTop: 45 }}>
-              <Text style={{ color: '#fff', fontSize: 15 }}>{text.createAccount} </Text>
+              <Text style={{ color: theme.text, fontSize: 15 }}>
+                {text.createAccount}{' '}
+              </Text>
               <Pressable onPress={() => navigation.navigate('Register')}>
-                <Text style={{ color: '#d8b4fe', fontSize: 15, textDecorationLine: 'underline' }}>{text.register}</Text>
+                <Text
+                  style={{
+                    color: theme.text,
+                    fontSize: 15,
+                    textDecorationLine: 'underline',
+                  }}
+                >
+                  {text.register}
+                </Text>
               </Pressable>
             </View>
           </View>
 
           {/* Footer */}
-          <View style={{ marginTop: 'auto', borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: '#475569', paddingTop: 12, paddingBottom: 8, alignItems: 'center' }}>
-            <Text style={{ color: '#fff', fontSize: 13, textAlign: 'center' }}>{text.copyright}</Text>
+          <View
+            style={{
+              marginTop: 'auto',
+              borderTopWidth: StyleSheet.hairlineWidth,
+              borderTopColor: theme.border,
+              paddingTop: 12,
+              paddingBottom: 8,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: theme.text, fontSize: 13, textAlign: 'center' }}>
+              {text.copyright}
+            </Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+    {/*<ThemeToggle />*/}
     </SafeAreaView>
   );
 }

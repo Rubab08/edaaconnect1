@@ -1,3 +1,5 @@
+import { useAppTheme } from '../components/theme/ThemeManager';
+//import ThemeToggle from '../components/theme/ThemeToggle';
 import { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -46,7 +48,7 @@ const glowColumns = [
 	{ left: '85%', height: '19%', width: 20 },
 	{ left: '95%', height: '23%', width: 15 },
 ];
-function BackgroundPattern() {
+function BackgroundPattern({ theme }) {
 	return (
 		<View pointerEvents="none" style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}>
 			
@@ -62,8 +64,8 @@ function BackgroundPattern() {
 }
 
 export default function RegisterScreen({ navigation }) {
+  const { theme } = useAppTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
-
 	const { t, language, toggleLanguage } = useTranslation();
 	const text = {
 		title: t('signUpTitle'),
@@ -214,49 +216,49 @@ export default function RegisterScreen({ navigation }) {
 	function renderField(label, field, placeholder, keyboardType = 'default') {
 		return (
 			<View style={{ marginBottom: 10 }}>
-				<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginBottom: 6 }}>{label}</Text>
+				<Text style={{ color: theme.text, fontSize: 12, fontWeight: '600', marginBottom: 6 }}>{label}</Text>
 				<TextInput
 					accessibilityLabel={label}
 					value={form[field]}
 					onChangeText={(value) => updateForm(field, value)}
 					placeholder={placeholder}
-					placeholderTextColor="#a3afbc"
+					placeholderTextColor={theme.placeholder}
 					keyboardType={keyboardType}
 					autoCapitalize="none"
 					autoCorrect={false}
 					secureTextEntry={field === 'password'}
-					style={[{ height: 35, borderRadius: 8, backgroundColor: '#001d31', paddingHorizontal: 12, color: '#fff', fontSize: 11 }, language === 'ar' && { textAlign: 'right' }]}
+					style={[{ height: 35, borderRadius: 8, backgroundColor: theme.inputBackground, paddingHorizontal: 12, color: theme.text, fontSize: 11 }, language === 'ar' && { textAlign: 'right' }]}
 				/>
-				{errors[field] && <Text style={{ color: '#ff6676', fontSize: 12, marginTop: 4 }}>{fieldErrorMessages[field]}</Text>}
+				{errors[field] && <Text style={{ color: theme.danger, fontSize: 12, marginTop: 4 }}>{fieldErrorMessages[field]}</Text>}
 			</View>
 		);
 	}
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#111d50' }} edges={['top', 'bottom']}>
-			<StatusBar barStyle="light-content" backgroundColor="#20205f" />
-			<BackgroundPattern />
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }} edges={['top', 'bottom']}>
+			<StatusBar barStyle={theme.statusBarStyle} backgroundColor={theme.background} />
+			<BackgroundPattern theme={theme} />
 			<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 				<ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingTop: 4, paddingBottom: 12}} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 					<View style={{ height: 32, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-						<Text style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', color: '#fff', fontSize: 16, fontWeight: '700' }}>{text.title}</Text>
+						<Text style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', color: theme.text, fontSize: 16, fontWeight: '700' }}>{text.title}</Text>
 						<Pressable accessibilityRole="button" accessibilityLabel={language === 'en' ? 'Change language' : 'تغيير اللغة'} onPress={toggleLanguage} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, zIndex: 1 }}>
-							<Ionicons name="sunny-outline" size={18} color="#fff" />
-							<Text style={{ color: '#fff', fontSize: 11 }}>{text.language}</Text>
+							<Ionicons name="language-outline" size={18} color={theme.text} />
+							<Text style={{ color: theme.text, fontSize: 11 }}>{text.language}</Text>
 						</Pressable>
 					</View>
 
 					<View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12, gap: 8 }}>
 						<Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => navigation.goBack()} style={{ width: 28, height: 28, justifyContent: 'center' }}>
-							<Ionicons name="arrow-back" size={18} color="#fff" />
+							<Ionicons name="arrow-back" size={18} color={theme.text} />
 						</Pressable>
 						<View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
 							{[0, 1, 2, 3].map((step) => (
 									<View key={step} style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-										<View style={{ width: 18, height: 18, borderWidth: step === 0 ? 2 : 1.5, borderColor: '#fff', borderRadius: 9, alignItems: 'center', justifyContent: 'center' }}>
-											{step === 0 && <View style={{ width: 11, height: 11, borderWidth: 1, borderColor: '#fff', borderRadius: 6 }} />}
+										<View style={{ width: 18, height: 18, borderWidth: step === 0 ? 2 : 1.5, borderColor: theme.border, borderRadius: 9, alignItems: 'center', justifyContent: 'center' }}>
+											{step === 0 && <View style={{ width: 11, height: 11, borderWidth: 1, borderColor: theme.border, borderRadius: 6 }} />}
 									</View>
-									{step < 3 && <View style={{ flex: 1, height: 2, backgroundColor: '#fff', marginHorizontal: 4 }} />}
+									{step < 3 && <View style={{ flex: 1, height: 2, backgroundColor: theme.surface, marginHorizontal: 4 }} />}
 								</View>
 							))}
 						</View>
@@ -270,16 +272,16 @@ export default function RegisterScreen({ navigation }) {
 							field.keyboardType
 						))}
 
-						<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginBottom: 6 }}>{text.gender}</Text>
+						<Text style={{ color: theme.text, fontSize: 12, fontWeight: '600', marginBottom: 6 }}>{text.gender}</Text>
 						<Dropdown
 							accessibilityLabel={text.gender}
-							style={{ height: 35, borderWidth: 1, borderColor: '#8393a8', borderRadius: 8, backgroundColor: '#001d31', paddingHorizontal: 12, marginBottom: 10 }}
-							containerStyle={{ backgroundColor: '#001d31', borderColor: '#8393a8', borderRadius: 8 }}
-							itemTextStyle={{ color: '#fff', fontSize: 11 }}
-							selectedTextStyle={{ color: '#fff', fontSize: 11 }}
-							placeholderStyle={{ color: '#bca3b4', fontSize: 11 }}
-							iconColor="#bca3ba"
-							activeColor="#1e303a"
+							style={{ height: 35, borderWidth: 1, borderColor: theme.border, borderRadius: 8, backgroundColor: theme.inputBackground, paddingHorizontal: 12, marginBottom: 10 }}
+							containerStyle={{ backgroundColor: theme.inputBackground, borderColor: theme.border, borderRadius: 8 }}
+							itemTextStyle={{ color: theme.text, fontSize: 11 }}
+							selectedTextStyle={{ color: theme.text, fontSize: 11 }}
+							placeholderStyle={{ color: theme.muted, fontSize: 11 }}
+							iconColor={theme.text}
+							activeColor={theme.inputBackground}
 							data={[
 								{ label: text.female, value: 'female' },
 								{ label: text.male, value: 'male' },
@@ -293,42 +295,42 @@ export default function RegisterScreen({ navigation }) {
 							dropdownPosition="bottom"
 							onChange={(item) => setGender(item.value)}
 							renderRightIcon={(isOpen) => (
-								<Ionicons name={isOpen ? 'chevron-up' : 'chevron-down'} size={14} color="#bca3ba" />
+								<Ionicons name={isOpen ? 'chevron-up' : 'chevron-down'} size={14} color={theme.text} />
 							)}
 						/>
 
-						<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginBottom: 6 }}>{text.birthDate}</Text>
+						<Text style={{ color: theme.text, fontSize: 12, fontWeight: '600', marginBottom: 6 }}>{text.birthDate}</Text>
 						<Pressable
 							accessibilityRole="button"
 							accessibilityLabel={text.birthDate}
 							onPress={openDatePicker}
-							style={{ height: 35, borderWidth: 1, borderColor: '#8393a8', borderRadius: 8, backgroundColor: '#001d31', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12 }}
+							style={{ height: 35, borderWidth: 1, borderColor: theme.border, borderRadius: 8, backgroundColor: theme.inputBackground, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12 }}
 						>
 							<Text style={{ flex: 1, color: birthDateValue === '—' ? '#9eafbd' : '#fff', fontSize: 11 }}>
 								{birthDateValue}
 							</Text>
-							<Ionicons name="calendar-outline" size={15} color="#a3afbc" />
+							<Ionicons name="calendar-outline" size={15} color={theme.muted} />
 						</Pressable>
-						{(errors.year || errors.month || errors.day) && <Text style={{ color: '#ff6676', fontSize: 12, marginTop: 4 }}>Please Enter Date Of Birth</Text>}
+						{(errors.year || errors.month || errors.day) && <Text style={{ color: theme.danger, fontSize: 12, marginTop: 4 }}>Please Enter Date Of Birth</Text>}
 
 						<View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 14, marginBottom: 14 }}>
 							<Pressable accessibilityRole="checkbox" accessibilityState={{ checked: acceptedTerms }} onPress={() => setAcceptedTerms(!acceptedTerms)} style={{ flexDirection: 'row', alignItems: 'center' }}>
-								<Ionicons name={acceptedTerms ? 'checkbox' : 'square-outline'} size={18} color="#fff" />
-								<Text style={{ color: '#fff', fontSize: 10, marginLeft: 5 }}>{text.terms}</Text>
+								<Ionicons name={acceptedTerms ? 'checkbox' : 'square-outline'} size={18} color={theme.text} />
+								<Text style={{ color: theme.text, fontSize: 10, marginLeft: 5 }}>{text.terms}</Text>
 							</Pressable>
 							<Pressable accessibilityRole="link" onPress={() => Alert.alert(text.termsLink)} style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 3 }}>
-								<Text style={{ color: '#d98aff', fontSize: 10, textDecorationLine: 'underline' }}>{text.termsLink}</Text>
-								<Ionicons name="open-outline" size={12} color="#d98aff" style={{ marginLeft: 3 }} />
+								<Text style={{ color: theme.text, fontSize: 10, textDecorationLine: 'underline' }}>{text.termsLink}</Text>
+								<Ionicons name="open-outline" size={12} color={theme.text} style={{ marginLeft: 3 }} />
 							</Pressable>
 						</View>
-						{errors.terms && <Text style={{ color: '#ff6676', fontSize: 12, marginTop: -16, marginBottom: 10 }}>{language === 'en' ? 'Please accept the terms.' : 'يرجى الموافقة على الشروط.'}</Text>}
+						{errors.terms && <Text style={{ color: theme.danger, fontSize: 12, marginTop: -16, marginBottom: 10 }}>{language === 'en' ? 'Please accept the terms.' : 'يرجى الموافقة على الشروط.'}</Text>}
 
 						<View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
-							<Pressable accessibilityRole="button" onPress={showCancelActions} style={{ height: 36, flex: 1, borderWidth: 1, backgroundColor: '#8124ee', borderRadius: 7, alignItems: 'center', justifyContent: 'center' }}>
-								<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{text.cancel}</Text>
+							<Pressable accessibilityRole="button" onPress={showCancelActions} style={{ height: 36, flex: 1, borderWidth: 1, backgroundColor: theme.accent, borderRadius: 7, alignItems: 'center', justifyContent: 'center' }}>
+								<Text style={{ color: theme.text, fontSize: 12, fontWeight: '600' }}>{text.cancel}</Text>
 							</Pressable>
-							<Pressable accessibilityRole="button" onPress={submitRegistration} style={{ height: 36, flex: 1, borderRadius: 7, backgroundColor: '#8124ee', alignItems: 'center', justifyContent: 'center' }}>
-								<Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{text.continue}</Text>
+							<Pressable accessibilityRole="button" onPress={submitRegistration} style={{ height: 36, flex: 1, borderRadius: 7, backgroundColor: theme.accent, alignItems: 'center', justifyContent: 'center' }}>
+								<Text style={{ color: theme.text, fontSize: 12, fontWeight: '600' }}>{text.continue}</Text>
 							</Pressable>
 						</View>
 					</View>
@@ -356,17 +358,17 @@ export default function RegisterScreen({ navigation }) {
 							onPress={() => setDatePickerVisible(false)}
 							style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
 						/>
-						<View style={{ backgroundColor: '#1d1d1f', borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingHorizontal: 20, paddingTop: 18, paddingBottom: 24 }}>
+						<View style={{ backgroundColor: theme.surface, borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingHorizontal: 20, paddingTop: 18, paddingBottom: 24 }}>
 							<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 12 }}>
 								<Pressable accessibilityRole="button" onPress={() => setDatePickerVisible(false)}>
-									<Text style={{ color: '#35a2ff', fontSize: 17 }}>{text.cancel}</Text>
+									<Text style={{ color: theme.accent, fontSize: 17 }}>{text.cancel}</Text>
 								</Pressable>
-								<Text style={{ color: '#fff', fontSize: 17, fontWeight: '600' }}>{text.birthDate}</Text>
+								<Text style={{ color: theme.text, fontSize: 17, fontWeight: '600' }}>{text.birthDate}</Text>
 								<Pressable accessibilityRole="button" onPress={() => {
 									applySelectedDate(datePickerValue);
 									setDatePickerVisible(false);
 								}}>
-									<Text style={{ color: '#35a2ff', fontSize: 17, fontWeight: '600' }}>{language === 'en' ? 'Done' : 'تم'}</Text>
+									<Text style={{ color: theme.accent, fontSize: 17, fontWeight: '600' }}>{language === 'en' ? 'Done' : 'تم'}</Text>
 								</Pressable>
 							</View>
 							<DateTimePicker
@@ -381,6 +383,7 @@ export default function RegisterScreen({ navigation }) {
 					</View>
 				</Modal>
 			)}
-		</SafeAreaView>
+			{/*<ThemeToggle />*/}
+    </SafeAreaView>
 	);
 };

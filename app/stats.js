@@ -1,3 +1,5 @@
+import { useAppTheme } from '../components/theme/ThemeManager';
+//import ThemeToggle from '../components/theme/ThemeToggle';
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +9,7 @@ import { getRequest } from '../components/mainURL.js';
 import { GET_PORTFOLIO_STATS } from '../components/EndPoints.js';
 
 const App = ({ navigation }) => {
+  const { theme } = useAppTheme();
   const [chartData, setChartData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [chartError, setChartError] = useState(null);
@@ -37,19 +40,19 @@ const App = ({ navigation }) => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#1A1B41' }}
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}
     edges={['right', 'left','bottom']}
     >
       <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
         
         {/* Total Balance Card */}
-        <View style={{ backgroundColor: '#8A2BE2', marginHorizontal: 16, borderRadius: 20, padding: 20, marginTop: 10 }}>
-          <Text style={{ color: 'white', fontSize: 36, fontWeight: 'bold' }}>
+        <View style={{ backgroundColor: theme.accent, marginHorizontal: 16, borderRadius: 20, padding: 20, marginTop: 10 }}>
+          <Text style={{ color: theme.text, fontSize: 36, fontWeight: 'bold' }}>
             {isBalanceVisible ? '֏2,340.00' : '••••••••'}
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
-            <Ionicons name="information-circle-outline" size={14} color="#E0E0E0" />
-            <Text style={{ color: '#E0E0E0', fontSize: 14, marginLeft: 5 }}>Total Balance</Text>
+            <Ionicons name="information-circle-outline" size={14} color={theme.muted} />
+            <Text style={{ color: theme.muted, fontSize: 14, marginLeft: 5 }}>Total Balance</Text>
             <TouchableOpacity
               onPress={() => setIsBalanceVisible(visible => !visible)}
               
@@ -58,7 +61,7 @@ const App = ({ navigation }) => {
               <Ionicons
                 name={isBalanceVisible ? "eye-outline" : "eye-off-outline"}
                 size={16}
-                color="#E0E0E0"
+                color={theme.muted}
                 style={{ marginLeft: 10 }}
               />
             </TouchableOpacity>
@@ -66,11 +69,11 @@ const App = ({ navigation }) => {
           
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 25 }}>
-            <TouchableOpacity style={{ backgroundColor: '#00A82D', paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8, flex: 1, marginRight: 10, alignItems: 'center' }}>
-              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>DEPOSIT</Text>
+            <TouchableOpacity style={{ backgroundColor: theme.success, paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8, flex: 1, marginRight: 10, alignItems: 'center' }}>
+              <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 14 }}>DEPOSIT</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{ backgroundColor: '#c82333', paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8, flex: 1, marginLeft: 10, alignItems: 'center' }}>
-              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>WITHDRAW</Text>
+            <TouchableOpacity style={{ backgroundColor: theme.danger, paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8, flex: 1, marginLeft: 10, alignItems: 'center' }}>
+              <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 14 }}>WITHDRAW</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -78,13 +81,13 @@ const App = ({ navigation }) => {
         {/* Chart Section */}
         <View style={{ paddingHorizontal: 20, marginTop: 30 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Cash | Holding</Text>
+            <Text style={{ color: theme.text, fontSize: 16, fontWeight: '600' }}>Cash | Holding</Text>
             
             <TouchableOpacity onPress={() => setIsDataVisible(!isDataVisible)}>
               <Ionicons 
                 name={isDataVisible ? "eye-outline" : "eye-off-outline"} 
                 size={18} 
-                color="white" 
+                color={theme.text}
                 style={{ marginLeft: 10 }} 
               />
             </TouchableOpacity>
@@ -92,9 +95,9 @@ const App = ({ navigation }) => {
           
           <View style={{ alignItems: 'center', marginVertical: 20, minHeight: 220, justifyContent: 'center' }}>
              {isLoading ? (
-               <ActivityIndicator size="large" color="#8A2BE2" />
+               <ActivityIndicator size="large" color={theme.accent} />
              ) : chartError ? (
-               <Text style={{ color: '#FF5252', textAlign: 'center' }}>
+               <Text style={{ color: theme.danger, textAlign: 'center' }}>
                  {chartError}
                </Text>
              ) : isDataVisible ? (
@@ -106,7 +109,7 @@ const App = ({ navigation }) => {
                  
                  
                  labelIndicator={
-                   <LineSegment style={{ stroke: 'white', strokeWidth: 1, opacity: 0.5 }} />
+                   <LineSegment style={{ stroke: theme.text, strokeWidth: 1, opacity: 0.5 }} />
                  }
                  labelIndicatorInnerOffset={10}
                  labelIndicatorOuterOffset={10}
@@ -122,7 +125,7 @@ const App = ({ navigation }) => {
                  
                  style={{
                    labels: { 
-                     fill: 'white', 
+                     fill: theme.text, 
                      fontSize: 13, 
                      fontWeight: "bold" 
                    }
@@ -141,77 +144,77 @@ const App = ({ navigation }) => {
         <View style={{ paddingHorizontal: 20 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
             {/* Cash Card */}
-            <View style={{ backgroundColor: '#0F2027', borderRadius: 12, padding: 15, flex: 1, marginRight: 8 }}>
+            <View style={{ backgroundColor: theme.surface, borderRadius: 12, padding: 15, flex: 1, marginRight: 8 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                <Text style={{ color: '#8892B0', fontSize: 14 }}>Cash</Text>
-                <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: '#D8B4FF' }} />
+                <Text style={{ color: theme.muted, fontSize: 14 }}>Cash</Text>
+                <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: theme.surfaceAlt }} />
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 {isDataVisible ? (
-                  <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>₼ 2,000,000</Text>
+                  <Text style={{ color: theme.text, fontSize: 18, fontWeight: 'bold' }}>₼ 2,000,000</Text>
                 ) : (
-                  <View style={{ height: 22, width: '70%', backgroundColor: '#1A2530', borderRadius: 4 }} />
+                  <View style={{ height: 22, width: '70%', backgroundColor: theme.surface, borderRadius: 4 }} />
                 )}
-                <Ionicons name="chevron-forward" size={16} color="white" />
+                <Ionicons name="chevron-forward" size={16} color={theme.text} />
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, height: 18 }}>
                 {isDataVisible ? (
                   <>
-                    <Text style={{ color: '#00E676', fontSize: 12 }}>+12.23% </Text>
-                    <Ionicons name="arrow-up" size={12} color="#00E676" />
+                    <Text style={{ color: theme.text, fontSize: 12 }}>+12.23% </Text>
+                    <Ionicons name="arrow-up" size={12} color={theme.text} />
                   </>
                 ) : (
-                  <View style={{ height: 14, width: '40%', backgroundColor: '#1A2530', borderRadius: 4 }} />
+                  <View style={{ height: 14, width: '40%', backgroundColor: theme.surface, borderRadius: 4 }} />
                 )}
               </View>
             </View>
 
             {/* Holding Card */}
-            <View style={{ backgroundColor: '#0F2027', borderRadius: 12, padding: 15, flex: 1, marginLeft: 8 }}>
+            <View style={{ backgroundColor: theme.surface, borderRadius: 12, padding: 15, flex: 1, marginLeft: 8 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                <Text style={{ color: '#8892B0', fontSize: 14 }}>Holding</Text>
-                <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: '#8A2BE2' }} />
+                <Text style={{ color: theme.muted, fontSize: 14 }}>Holding</Text>
+                <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: theme.accent }} />
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 {isDataVisible ? (
-                  <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>₼ 2,000,000</Text>
+                  <Text style={{ color: theme.text, fontSize: 18, fontWeight: 'bold' }}>₼ 2,000,000</Text>
                 ) : (
-                  <View style={{ height: 22, width: '70%', backgroundColor: '#1A2530', borderRadius: 4 }} />
+                  <View style={{ height: 22, width: '70%', backgroundColor: theme.surface, borderRadius: 4 }} />
                 )}
-                <Ionicons name="chevron-forward" size={16} color="white" />
+                <Ionicons name="chevron-forward" size={16} color={theme.text} />
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, height: 18 }}>
                 {isDataVisible ? (
                   <>
-                    <Text style={{ color: '#00E676', fontSize: 12 }}>+12.23% </Text>
-                    <Ionicons name="arrow-up" size={12} color="#00E676" />
+                    <Text style={{ color: theme.text, fontSize: 12 }}>+12.23% </Text>
+                    <Ionicons name="arrow-up" size={12} color={theme.text} />
                   </>
                 ) : (
-                  <View style={{ height: 14, width: '40%', backgroundColor: '#1A2530', borderRadius: 4 }} />
+                  <View style={{ height: 14, width: '40%', backgroundColor: theme.surface, borderRadius: 4 }} />
                 )}
               </View>
             </View>
           </View>
 
           {/* Unrealized Gain/Loss Card */}
-          <View style={{ backgroundColor: '#0F2027', borderRadius: 12, padding: 15 }}>
-            <Text style={{ color: '#8892B0', fontSize: 14, marginBottom: 5 }}>Unrealized Gain/Loss</Text>
+          <View style={{ backgroundColor: theme.surface, borderRadius: 12, padding: 15 }}>
+            <Text style={{ color: theme.muted, fontSize: 14, marginBottom: 5 }}>Unrealized Gain/Loss</Text>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               {isDataVisible ? (
-                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>₼ 2,000,000</Text>
+                <Text style={{ color: theme.text, fontSize: 18, fontWeight: 'bold' }}>₼ 2,000,000</Text>
               ) : (
-                <View style={{ height: 22, width: '40%', backgroundColor: '#1A2530', borderRadius: 4 }} />
+                <View style={{ height: 22, width: '40%', backgroundColor: theme.surface, borderRadius: 4 }} />
               )}
-              <Ionicons name="chevron-forward" size={16} color="white" />
+              <Ionicons name="chevron-forward" size={16} color={theme.text} />
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, height: 18 }}>
               {isDataVisible ? (
                 <>
-                  <Text style={{ color: '#FF5252', fontSize: 12 }}>-20.23% </Text>
-                  <Ionicons name="arrow-down" size={12} color="#FF5252" />
+                  <Text style={{ color: theme.danger, fontSize: 12 }}>-20.23% </Text>
+                  <Ionicons name="arrow-down" size={12} color={theme.danger} />
                 </>
               ) : (
-                <View style={{ height: 14, width: '20%', backgroundColor: '#1A2530', borderRadius: 4 }} />
+                <View style={{ height: 14, width: '20%', backgroundColor: theme.surface, borderRadius: 4 }} />
               )}
             </View>
           </View>
@@ -220,28 +223,29 @@ const App = ({ navigation }) => {
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <View style={{ position: 'absolute', bottom: 0, width: '100%', backgroundColor: '#0A1128', flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 15, paddingBottom: 25, borderTopWidth: 1, borderTopColor: '#1A1B41' }}>
+      <View style={{ position: 'absolute', bottom: 0, width: '100%', backgroundColor: theme.navBackground, flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 15, paddingBottom: 25, borderTopWidth: 1, borderTopColor: theme.border }}>
         <TouchableOpacity style={{ alignItems: 'center' }}>
-          <Ionicons name="folder-outline" size={20} color="#8892B0" />
-          <Text style={{ color: '#8892B0', fontSize: 10, marginTop: 4 }}>Portfolio</Text>
+          <Ionicons name="folder-outline" size={20} color={theme.muted} />
+          <Text style={{ color: theme.muted, fontSize: 10, marginTop: 4 }}>Portfolio</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{ alignItems: 'center' }}>
-          <Ionicons name="document-text-outline" size={20} color="#8892B0" />
-          <Text style={{ color: '#8892B0', fontSize: 10, marginTop: 4 }}>A/c Stmt</Text>
+          <Ionicons name="document-text-outline" size={20} color={theme.muted} />
+          <Text style={{ color: theme.muted, fontSize: 10, marginTop: 4 }}>A/c Stmt</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{ alignItems: 'center' }}>
-          <Ionicons name="stats-chart-outline" size={20} color="#8892B0" />
-          <Text style={{ color: '#8892B0', fontSize: 10, marginTop: 4 }}>Market</Text>
+          <Ionicons name="stats-chart-outline" size={20} color={theme.muted} />
+          <Text style={{ color: theme.muted, fontSize: 10, marginTop: 4 }}>Market</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{ alignItems: 'center' }}>
-          <Ionicons name="receipt-outline" size={20} color="#8892B0" />
-          <Text style={{ color: '#8892B0', fontSize: 10, marginTop: 4 }}>Order List</Text>
+          <Ionicons name="receipt-outline" size={20} color={theme.muted} />
+          <Text style={{ color: theme.muted, fontSize: 10, marginTop: 4 }}>Order List</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{ alignItems: 'center' }}>
-          <Ionicons name="wallet-outline" size={20} color="#8892B0" />
-          <Text style={{ color: '#8892B0', fontSize: 10, marginTop: 4 }}>Wallet</Text>
+          <Ionicons name="wallet-outline" size={20} color={theme.muted} />
+          <Text style={{ color: theme.muted, fontSize: 10, marginTop: 4 }}>Wallet</Text>
         </TouchableOpacity>
       </View>
+    {/*<ThemeToggle />*/}
     </SafeAreaView>
   );
 };

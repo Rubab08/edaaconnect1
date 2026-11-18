@@ -1,3 +1,5 @@
+import { useAppTheme } from '../components/theme/ThemeManager';
+//import ThemeToggle from '../components/theme/ThemeToggle';
 import React from 'react';
 import { Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,7 +8,8 @@ import { useEffect } from 'react';
 import { useLoading } from '../components/providers/LoadingContext';
 
 export default function HomeScreen({ navigation }) {
-
+  const { theme } = useAppTheme();
+  const styles = createStyles(theme);
   const { setIsLoading } = useLoading();
 
   useEffect(() => {
@@ -17,14 +20,14 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#0f143a" />
+      <StatusBar barStyle={theme.statusBarStyle} backgroundColor="transparent"/>
 
       <View style={styles.header}>
         <Pressable
           onPress={() => navigation.getParent()?.openDrawer()}
           style={styles.menuButton}
         >
-          <Ionicons name="menu" size={28} color="#fff" />
+          <Ionicons name="menu" size={28} color={theme.text} />
         </Pressable>
         <Text style={styles.headerTitle}>Home</Text>
         <View style={{ width: 40 }} />
@@ -43,14 +46,15 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.buttonText}>Back to Login</Text>
         </Pressable>
       </View>
+    {/*<ThemeToggle />*/}
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#0f143a',
+    backgroundColor: theme.background,
   },
   header: {
     flexDirection: 'row',
@@ -69,7 +73,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.08)',
   },
   headerTitle: {
-    color: '#fff',
+    color: theme.text,
     fontSize: 20,
     fontWeight: '700',
   },
@@ -80,7 +84,7 @@ const styles = StyleSheet.create({
     paddingVertical: 32,
   },
   eyebrow: {
-    color: '#c4b5fd',
+    color: theme.muted,
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 1,
@@ -88,45 +92,45 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   title: {
-    color: '#fff',
+    color: theme.text,
     fontSize: 36,
     fontWeight: '800',
     marginBottom: 8,
   },
   subtitle: {
-    color: '#dbeafe',
+    color: theme.muted,
     fontSize: 16,
     lineHeight: 22,
     marginBottom: 24,
   },
   card: {
-    backgroundColor: '#1e2a5a',
+    backgroundColor: theme.surface,
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#4338ca',
+    borderColor: theme.border,
   },
   cardTitle: {
-    color: '#fff',
+    color: theme.text,
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 8,
   },
   cardText: {
-    color: '#dbeafe',
+    color: theme.muted,
     fontSize: 15,
     lineHeight: 22,
   },
   button: {
-    backgroundColor: '#8b3dff',
+    backgroundColor: theme.accent,
     borderRadius: 10,
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: theme.text,
     fontSize: 17,
     fontWeight: '700',
   },

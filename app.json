@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "my-app",
-    "slug": "my-app",
+    "slug": "test-app",
     "version": "1.0.0",
     "scheme": "my-app",
     "orientation": "portrait",
@@ -16,7 +16,12 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ],
+      "package": "com.rubab11.testapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -30,6 +35,12 @@
           "faceIDPermission": "Allow Edaa Connect to use Face ID."
         }
       ]
-    ]
+    ],
+    "owner": "rubab11",
+    "extra": {
+      "eas": {
+        "projectId": "ff5522dd-6f03-4229-93f2-bb080914f67c"
+      }
+    }
   }
 }

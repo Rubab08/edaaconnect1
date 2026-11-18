@@ -1,3 +1,5 @@
+import { useAppTheme } from '../components/theme/ThemeManager';
+//import ThemeToggle from '../components/theme/ThemeToggle';
  import React, { useCallback, useState } from 'react';
  import {
    Alert,
@@ -16,12 +18,12 @@
  import AsyncStorage from '@react-native-async-storage/async-storage';
  import { useFocusEffect } from '@react-navigation/native';
  import axios from 'axios';
- //import * as Notifications from 'expo-notifications';
+ import * as Notifications from 'expo-notifications';
  import { useUser } from '../components/providers/UserContext';
  import { useTranslation } from '../components/providers/LanguageContext';
  import * as ImagePicker from 'expo-image-picker';
 
- /*Notifications.setNotificationHandler({
+ Notifications.setNotificationHandler({
     handleNotification: async () => ({
      shouldShowAlert: true,
      shouldPlaySound: true,
@@ -29,7 +31,7 @@
      shouldShowBanner: true,
      shouldShowList: true,
    }),
- });*/
+ });
 
  const slides = [
    { id: 'flower1', title: 'Daisy', image: require('../assets/flower1.png') },
@@ -40,6 +42,8 @@
 
 
  export default function ProfileScreen() {
+  const { theme } = useAppTheme();
+  const styles = createStyles(theme);
    const [currentSlide, setCurrentSlide] = useState(0);
    const { width } = useWindowDimensions();
    const carouselWidth = Math.max(width - 40, 0);
@@ -166,7 +170,7 @@
 
    return (
      <SafeAreaView style={styles.safeArea}>
-       <StatusBar barStyle="light-content" backgroundColor="#09156e" />
+       <StatusBar barStyle={theme.statusBarStyle} backgroundColor={theme.surfaceAlt} />
        <ScrollView contentContainerStyle={styles.content}>
 
         <View style={styles.heading}>
@@ -177,7 +181,6 @@
             <Text style={styles.eyebrow}>
               {text.storedPass}: {password || storedPassword || 'None'}
             </Text>
-            <Text style={styles.title}>{text.title}</Text>
           </View>
 
           {/* Profile Picture at Top Right */}
@@ -211,16 +214,7 @@
          */}
                 
 
-          {Platform.OS === 'ios' && (
-           <Pressable
-             accessibilityRole="button"
-             onPress={handleWelcomeNotification}
-             style={styles.notificationsBtn}
-           >
-             <Text style={styles.btnText}>Notify me</Text>
-           </Pressable>
-         )} 
-
+         <Text style={styles.title}>{text.title}</Text>
          <View style={styles.carouselFrame}>
            <Carousel
              data={slides}
@@ -248,15 +242,26 @@
              )}
            />
          </View>
+
+         {Platform.OS === 'ios' && (
+           <Pressable
+             accessibilityRole="button"
+             onPress={handleWelcomeNotification}
+             style={styles.notificationsBtn}
+           >
+             <Text style={styles.btnText}>Notify me</Text>
+           </Pressable>
+         )}
        </ScrollView>
-     </SafeAreaView>
+     {/*<ThemeToggle />*/}
+    </SafeAreaView>
    );
  }
 
- const styles = StyleSheet.create({
+ const createStyles = (theme) => StyleSheet.create({
    safeArea: {
      flex: 1,
-     backgroundColor: '#0f143a',
+     backgroundColor: theme.background,
    },
    content: {
      flexGrow: 1,
@@ -278,16 +283,17 @@
      flex: 1,
    },
    eyebrow: {
-     color: '#bd8aff',
+     color: theme.accent,
      fontSize: 12,
      fontWeight: '800',
      letterSpacing: 2,
      marginBottom: 8,
    },
    title: {
-     color: '#fff',
+     color: theme.text,
      fontSize: 28,
      fontWeight: '800',
+     marginBottom: 16,
    },
 
     profilePicContainer: {
@@ -295,11 +301,11 @@
     height: 60,
     borderRadius: 30,
     overflow: 'hidden',
-    backgroundColor: '#202957',
+    backgroundColor: theme.surface,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#bd8aff',
+    borderColor: theme.border,
   },
   profilePic: {
     width: '100%',
@@ -310,7 +316,7 @@
     alignItems: 'center',
   },
   profilePicText: {
-    color: '#bd8aff',
+    color: theme.accent,
     fontSize: 24,
     fontWeight: 'bold',
   },
@@ -323,7 +329,7 @@ apiButtonsContainer: {
     marginBottom: 20,
   },
   actionBtn: {
-    backgroundColor: '#bd8aff',
+    backgroundColor: theme.accent,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -333,28 +339,28 @@ apiButtonsContainer: {
   responseContainer: {
     width: '100%',
     maxWidth: 520,
-    backgroundColor: '#202957',
+    backgroundColor: theme.surface,
     padding: 15,
     borderRadius: 12,
     marginBottom: 24,
   },
   responseText: {
-    color: '#fff',
+    color: theme.text,
     fontSize: 14,
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
    notificationsBtn: {
-     backgroundColor: '#8b3dff',
+     backgroundColor: theme.accent,
      paddingVertical: 14,
      paddingHorizontal: 24,
      borderRadius: 12,
-     marginBottom: 24,
+     marginTop: 24,
      width: '100%',
      maxWidth: 520,
      alignItems: 'center',
    },
    btnText: {
-     color: '#ffffff',
+     color: theme.text,
      fontSize: 16,
      fontWeight: '700',
    },
@@ -373,7 +379,7 @@ apiButtonsContainer: {
      flex: 1,
      overflow: 'hidden',
      borderRadius: 22,
-     backgroundColor: '#202957',
+     backgroundColor: theme.surface,
    },
    image: {
      width: '100%',
@@ -389,7 +395,7 @@ apiButtonsContainer: {
      backgroundColor: 'rgba(177, 182, 212, 0.7)',
    },
    imageTitle: {
-     color: '#fff',
+     color: theme.text,
      fontSize: 18,
      fontWeight: '700',
    },

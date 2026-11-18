@@ -1,3 +1,5 @@
+import { useAppTheme } from '../components/theme/ThemeManager';
+//import ThemeToggle from '../components/theme/ThemeToggle';
 import React, { useEffect, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,6 +23,7 @@ const socket = io(SERVER_URL);
 
 
 export default function ChatScreen({ navigation }) {
+  const { theme } = useAppTheme();
   const { nin } = useUser();
   const myId = nin;
   const [recipientId, setRecipientId] = useState('');
@@ -79,7 +82,7 @@ export default function ChatScreen({ navigation }) {
 
     return (
       <Box
-        bg={isMe ? '#6D3CE9' : '$white'}
+        bg={isMe ? theme.messageMine : theme.messageOther}
         alignSelf={isMe ? 'flex-end' : 'flex-start'}
         px="$4"
         py="$3"
@@ -89,19 +92,19 @@ export default function ChatScreen({ navigation }) {
         borderBottomRightRadius={isMe ? 4 : '$2xl'}
         borderBottomLeftRadius={!isMe ? 4 : '$2xl'}
         borderWidth={isMe ? 0 : 1}
-        borderColor="$borderLight200"
+        borderColor={theme.border}
       >
         {!isMe && (
-          <Text fontSize="$xs" color="#6D3CE9" fontWeight="$semibold" mb="$1">
+          <Text fontSize="$xs" color={theme.accent} fontWeight="$semibold" mb="$1">
             {item.sender}
           </Text>
         )}
-        <Text color={isMe ? '$white' : '$textLight900'} fontSize="$md" lineHeight="$xl">
+        <Text color={isMe ? theme.messageMineText : theme.messageOtherText} fontSize="$md" lineHeight="$xl">
           {item.text}
         </Text>
         <Text
           fontSize="$2xs"
-          color={isMe ? '#E7DDFE' : '$textLight500'}
+          color={isMe ? '#E7DDFE' : theme.muted}
           mt="$2"
           alignSelf="flex-end"
         >
@@ -112,20 +115,20 @@ export default function ChatScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#ddd2e8' }}
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}
       edges={['right','bottom','left']}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <VStack
-          bg="$white"
+          bg={theme.surface}
           px="$5"
           pt="$4"
           pb="$5"
           space="md"
           borderBottomWidth={1}
-          borderColor="$borderLight200"
+          borderColor={theme.border}
         >
           
           <HStack alignItems="center" space="md">
@@ -133,17 +136,17 @@ export default function ChatScreen({ navigation }) {
               width={48}
               height={40}
               borderRadius="$full"
-              bg="#F0EAFE"
+              bg={theme.inputBackground}
               alignItems="center"
               justifyContent="center"
             >
-              <Ionicons name="chatbubbles" size={22} color="#6D3CE9" />
+              <Ionicons name="chatbubbles" size={22} color={theme.accent} />
             </Box>
             <VStack flex={1} space="xs">
-              <Heading size="lg" color="$textLight900">
+              <Heading size="lg" color={theme.text}>
                 Messages
               </Heading>
-              <Text fontSize="$sm" color="$textLight500">
+              <Text fontSize="$sm" color={theme.muted}>
                 Signed in as {myId || 'Guest'}
               </Text>
             </VStack>
@@ -153,23 +156,25 @@ export default function ChatScreen({ navigation }) {
               borderRadius="$full"
               bg={isConnected ? '#22C55E' : '#F59E0B'}
             />
-            <Text fontSize="$xs" color="$textLight500">
+            <Text fontSize="$xs" color={theme.muted}>
               {isConnected ? 'Online' : 'Connecting'}
             </Text>
           </HStack>
 
           <VStack space="xs">
-            <Text fontSize="$xs" color="$textLight500" fontWeight="$semibold">
+            <Text fontSize="$xs" color={theme.muted} fontWeight="$semibold">
               SEND TO
             </Text>
             <Input
               variant="outline"
               size="md"
               borderRadius="$xl"
-              bg="#FAF9FC"
-              borderColor="$borderLight300"
+              bg={theme.inputBackground}
+              borderColor={theme.border}
             >
               <InputField
+              color={theme.inputText}
+              placeholderTextColor={theme.placeholder}
                 accessibilityLabel="Recipient identity"
                 placeholder="Enter recipient ID"
                 value={recipientId}
@@ -199,17 +204,17 @@ export default function ChatScreen({ navigation }) {
                   width={72}
                   height={72}
                   borderRadius="$full"
-                  bg="#F0EAFE"
+                  bg={theme.inputBackground}
                   alignItems="center"
                   justifyContent="center"
                 >
-                  <Ionicons name="chatbubble-ellipses-outline" size={32} color="#6D3CE9" />
+                  <Ionicons name="chatbubble-ellipses-outline" size={32} color={theme.accent} />
                 </Box>
                 <VStack alignItems="center" space="xs">
-                  <Heading size="md" color="$textLight900">
+                  <Heading size="md" color={theme.text}>
                     Start your conversation
                   </Heading>
-                  <Text color="$textLight500" textAlign="center">
+                  <Text color={theme.muted} textAlign="center">
                     Enter a recipient ID above, then send your first message.
                   </Text>
                 </VStack>
@@ -219,23 +224,25 @@ export default function ChatScreen({ navigation }) {
         </Box>
 
         <HStack
-          bg="$white"
+          bg={theme.surface}
           px="$4"
           py="$3"
           space="sm"
           alignItems="center"
           borderTopWidth={1}
-          borderColor="$borderLight200"
+          borderColor={theme.border}
         >
           <Input
             flex={1}
             variant="outline"
             size="md"
             borderRadius="$2xl"
-            bg="#FAF9FC"
-            borderColor="$borderLight300"
+            bg={theme.inputBackground}
+            borderColor={theme.border}
           >
             <InputField
+              color={theme.inputText}
+              placeholderTextColor={theme.placeholder}
               accessibilityLabel="Message"
               placeholder="Write a message..."
               value={message}
@@ -249,7 +256,7 @@ export default function ChatScreen({ navigation }) {
             size="md"
             variant="default"
             action="primary"
-            bg="#6D3CE9"
+            bg={theme.accent}
             borderRadius="$2xl"
             px="$4"
             isDisabled={!recipientId.trim() || !message.trim()}
@@ -260,6 +267,7 @@ export default function ChatScreen({ navigation }) {
           </Button>
         </HStack>
       </KeyboardAvoidingView>
+    {/*<ThemeToggle />*/}
     </SafeAreaView>
   );
 }
