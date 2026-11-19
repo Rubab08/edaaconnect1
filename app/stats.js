@@ -1,12 +1,33 @@
 import { useAppTheme } from '../components/theme/ThemeManager';
 //import ThemeToggle from '../components/theme/ThemeToggle';
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Alert, View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { VictoryPie, LineSegment} from 'victory-native';
 import { getRequest } from '../components/mainURL.js';
+import { Formik } from 'formik';
 import { GET_PORTFOLIO_STATS } from '../components/EndPoints.js';
+   import {
+  Modal,
+  ModalBackdrop,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  Heading,
+  Input,
+  InputField,
+  Button,
+  ButtonText,
+  HStack,
+  VStack,
+  Box,
+   Icon,
+   CloseIcon,
+  Text as GluestackText
+} from '@gluestack-ui/themed';
 
 const App = ({ navigation }) => {
   const { theme } = useAppTheme();
@@ -16,6 +37,7 @@ const App = ({ navigation }) => {
   
   const [isDataVisible, setIsDataVisible] = useState(true);
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchChartData = async () => {
@@ -69,11 +91,25 @@ const App = ({ navigation }) => {
           
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 25 }}>
-            <TouchableOpacity style={{ backgroundColor: theme.success, paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8, flex: 1, marginRight: 10, alignItems: 'center' }}>
-              <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 14 }}>DEPOSIT</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{ backgroundColor: theme.danger, paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8, flex: 1, marginLeft: 10, alignItems: 'center' }}>
-              <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 14 }}>WITHDRAW</Text>
+            <TouchableOpacity
+            onPress={() => setShowModal(true)}
+            style={{ 
+             backgroundColor: theme.danger,
+             paddingVertical: 12,
+             paddingHorizontal: 30,
+             borderRadius: 8,
+             flex: 1,
+             marginRight: 10,
+             alignItems: 'center' 
+
+
+            }}
+          > 
+            <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 14 }}>DEPOSIT</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={{ backgroundColor: theme.danger, paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8, flex: 1, marginLeft: 10, alignItems: 'center' }}>
+            <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 14 }}>WITHDRAW</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -246,6 +282,265 @@ const App = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     {/*<ThemeToggle />*/}
+    
+
+  
+{/* MODAL FOR DEPOSIT WITH FORMIK FORM */}
+
+<Modal
+  isOpen={showModal}
+  onClose={() => setShowModal(false)}
+>
+  <ModalBackdrop />
+
+  <ModalContent
+    bg={theme.surface}
+    borderColor={theme.border}
+    borderWidth={1}
+    borderRadius={15}
+    p="$5"       
+    maxW="700%"     
+    h="80%"   
+  >
+    <ModalHeader
+  justifyContent="space-between"
+  alignItems="center"
+  position="relative"
+  mb="$5"
+>
+  <VStack
+        w="100%"
+        alignItems="center"
+        space="xs"
+        mt="$5"
+      >
+
+  <Ionicons
+    name="wallet-outline"
+    size={64}
+    color={theme.accent}
+  />
+
+  <Heading size="2xl" fontWeight="$bold" color={theme.text}
+  textAlign="center"
+  >
+    Deposit Amount
+  
+  </Heading>
+   <GluestackText
+          color={theme.muted}
+          fontSize={18}
+          textAlign="center"
+        >
+          Add amount to your account
+        </GluestackText>
+      </VStack>
+
+  <ModalCloseButton
+        position="absolute"
+        top={0}
+        right={0}
+        onPress={() => setShowModal(false)}
+      >
+        <Icon
+          as={CloseIcon}
+          color={theme.text}
+          size="md"
+        />
+      </ModalCloseButton>
+</ModalHeader>
+
+  <Box flex={1} justifyContent="center"></Box>
+    <Formik
+      initialValues={{
+        name: '',
+        amount: ''
+      }}
+
+      validate={(values) => {
+        const errors = {};
+
+        if (!values.name) {
+          errors.name = 'Name is required';
+        }
+
+        if (!values.amount) {
+          errors.amount = 'Amount is required';
+        }
+
+        return errors;
+      }}
+
+      onSubmit={(values) => {
+        console.log(values);
+        setShowModal(false);
+      }}
+    >
+      {({
+        handleChange,
+        handleSubmit,
+        handleBlur,
+        values,
+        errors,
+        touched
+      }) => (
+        <>
+          <ModalBody
+          >
+            <VStack space="md" mt="$4">
+
+              {/* Name Input */}
+
+              
+              <Input
+              bg={theme.background}
+                  borderColor={theme.border}
+                  borderWidth={1}
+                  borderRadius={12}
+                  h={50}
+                  alignItems="center"
+              
+>
+
+                   {/* person icon */}
+                  <Box ml="$3" mr="$2">
+                    <Ionicons
+                      name="person-outline"
+                      size={20}
+                      color={theme.muted}
+                    />
+                  </Box>
+
+                <InputField
+                  placeholder="Enter Name"
+                  placeholderTextColor={theme.muted}
+                  color={theme.text}
+                  value={values.name}
+                  onChangeText={handleChange('name')}
+                  onBlur={handleBlur('name')}
+                  
+                />
+              </Input>
+
+              {touched.name && errors.name && (
+                <GluestackText color="#FF0000">
+                  {errors.name}
+                </GluestackText>
+              )}
+
+              {/* Amount Input */}
+               
+                   <Input
+                  bg={theme.background}
+                  borderColor={theme.border}
+                  borderWidth={1}
+                  borderRadius={12}
+                  h={50}
+                  alignItems="center"
+                >
+
+                  {/* NEW: Coins icon */}
+                  <Box ml="$3" mr="$2">
+                    <Ionicons
+                      name="cash-outline"
+                      size={20}
+                      color={theme.muted}
+                    />
+                  </Box>
+
+
+
+                  <InputField
+                    flex={1}
+                    placeholder="Enter Amount"
+                    placeholderTextColor={theme.muted}
+                    color={theme.text}
+                    value={values.amount}
+                    onChangeText={handleChange('amount')}
+                    onBlur={handleBlur('amount')}
+                  />
+
+                </Input>
+
+              {touched.amount && errors.amount && (
+                <GluestackText color="#FF0000">
+                  {errors.amount}
+                </GluestackText>
+              )}
+
+            </VStack>
+          </ModalBody>
+
+          <ModalFooter mt="$4">
+
+         {/* Purple button */}
+              <Button
+                w="100%"
+                h={50}
+                borderRadius={12}
+                bg="#713DF0"
+                mt="$2"
+                onPress={handleSubmit}
+              >
+
+                <HStack
+                  alignItems="center"
+                  space="sm"
+                >
+
+                  {/* NEW: Deposit icon */}
+                  <Ionicons
+                    name="download-outline"
+                    size={20}
+                    color="#FFFFFF"
+                  />
+
+                  <ButtonText
+                    color="#FFFFFF"
+                    fontWeight="bold"
+                    fontSize={16}
+                  >
+                    Deposit
+                  </ButtonText>
+
+                </HStack>
+              </Button>
+
+
+              {/* CANCEL BUTTON */}
+
+              <Button
+                variant="outline"
+                w="100%"
+                h={48}
+                borderRadius={12}
+                borderColor={theme.border}
+                borderWidth={1}
+                bg="transparent"
+                onPress={() => setShowModal(false)}
+                mt="$2"
+              >
+
+                <ButtonText
+                  color={theme.muted}
+                  fontWeight="600"
+                  fontSize={15}
+                >
+                  Cancel
+                </ButtonText>
+
+              </Button>
+
+          </ModalFooter>
+        </>
+      )}
+    </Formik>
+  </ModalContent>
+</Modal>
+
+
+
+
     </SafeAreaView>
   );
 };

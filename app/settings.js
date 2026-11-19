@@ -13,12 +13,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
-// Shared theme manager
 import { useAppTheme } from '../components/theme/ThemeManager';
 
 export default function SettingsScreen() {
 
-  // Theme shared across all screens
   const { theme, mode, toggleTheme } = useAppTheme();
 
   const settings = [

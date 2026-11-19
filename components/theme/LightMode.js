@@ -1,6 +1,6 @@
 
 export const LightMode = {
-  // General app colors
+  // General colors
   background: '#f8fafc',
   surface: '#ffffff',
   surfaceAlt: '#eef2ff',
@@ -13,7 +13,7 @@ export const LightMode = {
   placeholder: '#64748b',
   navBackground: '#ffffff',
 
-  // Onboarding screen
+  
   onboardingBackground: '#f8fafc',
   onboardingTitle: '#0f172a',
 

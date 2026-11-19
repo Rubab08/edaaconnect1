@@ -14,7 +14,8 @@ const listeners = new Set();
 const subscribe = (listener) => {
   listeners.add(listener);
 
-  return () => {
+  return () => 
+    {
     listeners.delete(listener);
   };
 };

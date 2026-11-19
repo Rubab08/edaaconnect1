@@ -92,7 +92,7 @@ const handleInactivity = (isInactive) => {
 
 
     <UserInactivity
-      timeForInactivity={5000}
+      timeForInactivity={1800000}
       onAction={handleInactivity}
       style={{ flex: 1 }}
     >

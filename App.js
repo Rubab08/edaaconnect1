@@ -70,7 +70,7 @@ export default function App() {
               <LoadingProvider>
 
                 <UserInactivity
-                  timeForInactivity={900000}
+                  timeForInactivity={1800000}
                   onAction={handleInactivity}
                   isActive={isLoggedIn && !isSessionExpired}
                   style={{ flex: 1 }}

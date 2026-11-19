@@ -13,7 +13,7 @@ export const DarkMode = {
   placeholder: '#a3afbc',
   navBackground: '#0a1128',
 
-  // Onboarding screen
+  
   onboardingBackground: '#1e2343',
   onboardingTitle: '#ffffff',
 
